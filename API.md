@@ -1,0 +1,137 @@
+# API Documentation
+
+## Table of Contents
+
+- [How to Use?](#how-to-use)
+
+- [Authentication & Users](#authentication--users)
+
+    - [User Registration](#user-registration)
+
+    - [Login](#login)
+
+    - [Refresh Token](#refresh-token)
+
+    - [Current User Profile](#current-user-profile)
+
+    - [User Public Profile](#user-public-profile)
+
+    - [Update User Profile](#update-user-profile)
+
+- [Topics](#topics)
+
+    - [List Topics](#list-topics)
+
+    - [Create Topic](#create-topic)
+
+    - [Get Topic Details](#get-topic-details)
+
+- [Posts](#posts)
+
+    - [List Posts Inside a Topic](#list-posts-inside-a-topic)
+
+    - [Create Post Inside a Topic](#create-post-inside-a-topic)
+
+    - [Get Post Details](#get-post-details)
+
+    - [Update Post](#update-post)
+
+    - [Delete Post](#delete-post)
+
+- [Comments](#comments)
+
+    - [List Comments on a Post](#list-comments-on-a-post)
+
+    - [Create Comment on a Post](#create-comment-on-a-post)
+
+    - [Get Comment Details](#get-comment-details)
+
+    - [Update Comment](#update-comment)
+
+    - [Delete Comment](#delete-comment)
+
+## How to Use?
+
+## Authentication & Users
+
+### User Registration
+
+- Endpoint: `POST {ROOT}/auth/register`
+
+### Login
+
+- Endpoint: `POST {ROOT}/auth/login`
+
+### Refresh Token
+
+- Endpoint: `POST {ROOT}/auth/refresh`
+
+### Current User Profile
+
+- Endpoint: `GET {ROOT}/users/me`
+
+### User Public Profile
+
+- Endpoint: `GET {ROOT}/users/{user_id}`
+
+### Update User Profile
+
+- Endpoint: `PATCH {ROOT}/users/{user_id}`
+
+## Topics
+
+### List Topics
+
+- Endpoint: `GET {ROOT}/topics`
+
+### Create Topic
+
+- Endpoint: `POST {ROOT}/topics`
+
+### Get Topic Details
+
+- Endpoint: `GET {ROOT}/topics/{topic_id}`
+
+## Posts
+
+### List Posts Inside a Topic
+
+- Endpoint: `GET {ROOT}/topics/{topic_id}/posts`
+
+### Create Post Inside a Topic
+
+- Endpoint: `POST {ROOT}/topics/{topic_id}/posts`
+
+### Get Post Details
+
+- Endpoint: `GET {ROOT}/posts/{post_id}`
+
+### Update Post
+
+- Endpoint: `PATCH {ROOT}/posts/{post_id}`
+
+### Delete Post
+
+- Endpoint: `DELETE {ROOT}/posts/{post_id}`
+
+## Comments
+
+### List Comments on a Post
+
+- Endpoint: `GET {ROOT}/posts/{post_id}/comments`
+
+### Create Comment on a Post
+
+- Endpoint: `POST {ROOT}/posts/{post_id}/comments`
+
+### Get Comment Details
+
+- Endpoint: `GET {ROOT}/comments/{comment_id}`
+
+### Update Comment
+
+- Endpoint: `PATCH {ROOT}/comments/{comment_id}`
+
+### Delete Comment
+
+- Endpoint: `DELETE {ROOT}/comments/{comment_id}`
