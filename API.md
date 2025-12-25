@@ -54,7 +54,7 @@
 
 ## Authentication & Users
 
-### User Registration
+### Register User
 
 - Endpoint: `POST {ROOT}/auth/register`
 
@@ -62,21 +62,21 @@
 
 - Endpoint: `POST {ROOT}/auth/login`
 
-### Refresh Token
+### Refresh Access Token
 
 - Endpoint: `POST {ROOT}/auth/refresh`
 
-### Current User Profile
-
-- Endpoint: `GET {ROOT}/users/me`
-
-### User Public Profile
+### Get User Public Profile
 
 - Endpoint: `GET {ROOT}/users/{user_id}`
 
+### Get Current User Profile
+
+- Endpoint: `GET {ROOT}/users/me`
+
 ### Update User Profile
 
-- Endpoint: `PATCH {ROOT}/users/{user_id}`
+- Endpoint: `PATCH {ROOT}/users/me`
 
 ## Topics
 
