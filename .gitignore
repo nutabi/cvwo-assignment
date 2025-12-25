@@ -1,3 +1,35 @@
-# Ignore submission writeup files
-markdown-pdf.css
-writeup*
+# Binaries for programs
+*.exe
+*.darwin-amd64
+*.darwin-arm64
+*.freebsd-*
+*.linux-*
+*.windows-*
+
+# Test binary, can be ignored with many tools
+[a-zA-Z]*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories (remove the "target" directory)
+vendor/
+target/
+
+# IDE and editor files
+.idea/
+.vscode/
+.history/
+.sublime-*
+*.swp
+*.swo
+
+# Project-local godep directory
+godeps/
+
+# Environment files
+.env
+
+# OS-generated files
+.DS_Store
+.Thumbs.db
