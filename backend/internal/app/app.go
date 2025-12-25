@@ -9,12 +9,13 @@ import (
 	v1 "github.com/nutabi/cvwo-assignment/backend/internal/handlers/v1"
 	"github.com/nutabi/cvwo-assignment/backend/internal/middleware"
 	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
+	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 	"gorm.io/driver/sqlite"
 )
 
 type App struct {
 	serverAddress  string
-	repo           repository.Repository
+	service        service.Service
 	authMiddleware *gin_jwt.GinJWTMiddleware
 }
 
@@ -26,6 +27,9 @@ func Initialise(cfg config.Config) App {
 		slog.Error("Failed to connect to database", "error", err)
 	}
 
+	// Initialise service layer
+	svc := service.Default(repo)
+
 	// Initialise middleware
 	auth := middleware.NewAuthConfig(
 		repo,
@@ -33,7 +37,11 @@ func Initialise(cfg config.Config) App {
 		cfg.GetServerHostname(),
 		cfg.GetJWTSecretKey(),
 	)
-	return App{repo: repo, authMiddleware: auth}
+	return App{
+		serverAddress:  cfg.GetServerAddress(),
+		service:        svc,
+		authMiddleware: auth,
+	}
 }
 
 func (a *App) Start() {
@@ -41,7 +49,7 @@ func (a *App) Start() {
 	r := gin.New()
 
 	// Add routes
-	v1.RegisterRoutes(r.Group("/v1"), a.repo, a.authMiddleware)
+	v1.RegisterRoutes(r.Group("/v1"), a.service, a.authMiddleware)
 
 	// Start listening
 	err := r.Run(a.serverAddress)
