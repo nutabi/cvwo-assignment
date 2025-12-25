@@ -3,6 +3,7 @@ package api
 import (
 	"log/slog"
 
+	"github.com/nutabi/cvwo-assignment/backend/internal/app"
 	"github.com/nutabi/cvwo-assignment/backend/internal/config"
 )
 
@@ -14,7 +15,9 @@ func main() {
 		panic(err)
 	}
 
-	// TODO: Initialize application with configuration
+	// Initialise application with configuration
+	app := app.Initialise(cfg)
 
-	// TODO: Start the API server
+	// Start the API server
+	app.Start()
 }

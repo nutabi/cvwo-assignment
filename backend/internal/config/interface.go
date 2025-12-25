@@ -10,4 +10,13 @@ type Config interface {
 
 	// Get full server address in the format hostname:port.
 	GetServerAddress() string
+
+	// Get database connection string.
+	GetDSN() string
+
+	// Check if the application is running in debug mode.
+	IsDebug() bool
+
+	// Get JWT secret key for authentication.
+	GetJWTSecretKey() string
 }

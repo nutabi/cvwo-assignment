@@ -12,6 +12,9 @@ import (
 type config struct {
 	serverHostname string
 	serverPort     int
+	databaseUrl    string
+	jwtSecret      string
+	debug          bool
 }
 
 // Return the application configuration.
@@ -70,4 +73,16 @@ func (c *config) GetServerPort() int {
 
 func (c *config) GetServerAddress() string {
 	return c.serverHostname + ":" + fmt.Sprintf("%d", c.serverPort)
+}
+
+func (c *config) GetDSN() string {
+	return "sqlite::memory:"
+}
+
+func (c *config) IsDebug() bool {
+	return c.debug
+}
+
+func (c *config) GetJWTSecretKey() string {
+	return c.jwtSecret
 }
