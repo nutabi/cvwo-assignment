@@ -21,5 +21,5 @@ func RegisterRoutes(
 		authMiddleware: authMiddleware,
 	}
 
-	h.registerAuthRoutes(r)
+	h.registerAuthRoutes(r.Group("/auth"))
 }
