@@ -21,6 +21,17 @@ func ConnectSQL(dialect gorm.Dialector) (Repository, error) {
 	return &sqlRepository{db: *db}, nil
 }
 
+func (r *sqlRepository) GetUserByID(
+	ctx context.Context,
+	id uint,
+) (model.User, error) {
+	user, err := gorm.
+		G[model.User](&r.db).
+		Where("id = ?", id).
+		First(ctx)
+	return user, err
+}
+
 func (r *sqlRepository) GetUserByUsername(
 	ctx context.Context,
 	username string,
@@ -30,4 +41,15 @@ func (r *sqlRepository) GetUserByUsername(
 		Where("username = ?", username).
 		First(ctx)
 	return user, err
+}
+
+func (r *sqlRepository) UpdateUser(
+	ctx context.Context,
+	user *model.User,
+) error {
+	_, err := gorm.
+		G[model.User](&r.db).
+		Where("id = ?", user.ID).
+		Updates(ctx, model.User{AvatarURL: user.AvatarURL, Bio: user.Bio})
+	return err
 }
