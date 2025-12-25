@@ -22,4 +22,5 @@ func RegisterRoutes(
 	}
 
 	h.registerAuthRoutes(r.Group("/auth"))
+	h.registerUserRoutes(r.Group("/users"))
 }
