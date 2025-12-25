@@ -17,7 +17,7 @@ import (
 const (
 	JwtRealm            = "cvwo-assignment"
 	JwtSigningAlgorithm = "HS512"
-	IdentityKey         = "sub"
+	UserIdentityKey     = "sub"
 
 	JwtIssuer   = "cvwo-assignment-backend"
 	JWTAudience = "cvwo-assignment-frontend"
@@ -69,7 +69,7 @@ func NewAuthConfig(
 			}
 			return jwt.MapClaims{}
 		},
-		IdentityKey:    IdentityKey,
+		IdentityKey:    UserIdentityKey,
 		TokenLookup:    "header:Authorization,cookie:jwt",
 		SendCookie:     true,
 		SecureCookie:   !isDebug,
