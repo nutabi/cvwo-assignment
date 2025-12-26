@@ -79,7 +79,7 @@ func (c *config) GetServerAddress() string {
 }
 
 func (c *config) GetDSN() string {
-	return "sqlite::memory:"
+	return c.databaseUrl
 }
 
 func (c *config) IsDebug() bool {
