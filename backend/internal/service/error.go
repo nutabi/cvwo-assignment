@@ -1,13 +1,12 @@
 package service
 
 import (
-	"fmt"
+	"errors"
 )
 
-func ErrUserNotFound(id uint) error {
-	return fmt.Errorf("user with ID %v not found", id)
-}
-
-func ErrDatabaseUnknown(err error) error {
-	return fmt.Errorf("unknown database error: %v", err)
-}
+var (
+	ErrUserNotFound    = errors.New("user not found")
+	ErrUsernameTaken   = errors.New("username taken")
+	ErrEmailInUse      = errors.New("email in use")
+	ErrDatabaseUnknown = errors.New("unknown database error")
+)
