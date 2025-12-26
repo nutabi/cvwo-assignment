@@ -12,9 +12,9 @@ func handleUserRegistration(svc service.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// Parse request body
 		var reqBody struct {
-			Username string `form:"username" json:"username" binding:"required"`
-			Email    string `form:"email" json:"email" binding:"required"`
-			Password string `form:"password" json:"password" binding:"required"`
+			Username string `form:"username" json:"username"`
+			Email    string `form:"email" json:"email"`
+			Password string `form:"password" json:"password"`
 		}
 		if err := c.ShouldBind(&reqBody); err != nil {
 			respondWithError(c, http.StatusUnprocessableEntity, "Invalid request body")
@@ -23,11 +23,14 @@ func handleUserRegistration(svc service.Service) func(c *gin.Context) {
 
 		// Validate input
 		if !utility.ValidateUsername(reqBody.Username) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid username")
+			respondWithError(c, http.StatusUnprocessableEntity, "Invalid or missing username")
+			return
 		} else if !utility.ValidateEmail(reqBody.Email) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid email")
+			respondWithError(c, http.StatusUnprocessableEntity, "Invalid or missing email")
+			return
 		} else if !utility.ValidatePassword(reqBody.Password) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid password")
+			respondWithError(c, http.StatusUnprocessableEntity, "Invalid or missing password")
+			return
 		}
 
 		// Delegate to service layer for registration
