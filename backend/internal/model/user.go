@@ -11,6 +11,6 @@ type User struct {
 	AvatarURL *string
 	Bio       *string
 
-	Posts    []*Post    `gorm:"constraint:OnDelete:CASCADE"`
-	Comments []*Comment `gorm:"constraint:OnDelete:CASCADE"`
+	Posts    []*Post    `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
+	Comments []*Comment `gorm:"foreignKey:AuthorID;constraint:OnDelete:CASCADE"`
 }
