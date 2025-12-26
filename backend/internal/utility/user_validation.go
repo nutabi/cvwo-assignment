@@ -2,7 +2,7 @@ package utility
 
 import "strconv"
 
-func ValidatePasswordStrength(password string) bool {
+func ValidatePassword(password string) bool {
 	return true
 }
 
