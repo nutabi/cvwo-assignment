@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
+	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 	"gorm.io/gorm"
 )
 
@@ -25,9 +27,9 @@ func (s *defaultService) GetUserProfileByID(ctx context.Context, id uint) (*User
 	user, err := s.repo.GetUserByID(ctx, id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, ErrUserNotFound(id)
+			return nil, ErrUserNotFound
 		} else {
-			return nil, ErrDatabaseUnknown(err)
+			return nil, errors.Join(ErrDatabaseUnknown, err)
 		}
 	}
 
@@ -72,8 +74,48 @@ func (s *defaultService) UpdateCurrentUserProfile(
 
 	// Save changes via repository
 	if err := s.repo.UpdateUser(ctx, user); err != nil {
-		return ErrDatabaseUnknown(err)
+		return errors.Join(ErrDatabaseUnknown, err)
 	}
 
 	return nil
+}
+
+func (s *defaultService) RegisterUser(ctx context.Context, username, email, password string) (*UserProfile, error) {
+	// Check for existing username or email
+	usernameExists, err := s.repo.CheckUsernameExists(ctx, username)
+	if err != nil {
+		return nil, errors.Join(ErrDatabaseUnknown, err)
+	}
+	if usernameExists {
+		return nil, ErrUsernameTaken
+	}
+
+	emailExists, err := s.repo.CheckEmailExists(ctx, email)
+	if err != nil {
+		return nil, errors.Join(ErrDatabaseUnknown, err)
+	}
+	if emailExists {
+		return nil, ErrEmailInUse
+	}
+
+	// Hash password
+	phc, err := utility.ComputePHC(password)
+	if err != nil {
+		return nil, errors.Join(ErrDatabaseUnknown, err)
+	}
+
+	// Create new user model
+	newUser := model.User{
+		Username: username,
+		Email:    email,
+		PHC:      phc,
+	}
+
+	// Save new user via repository
+	if err := s.repo.CreateUser(ctx, &newUser); err != nil {
+		return nil, errors.Join(ErrDatabaseUnknown, err)
+	}
+
+	// Return the newly created user's profile
+	return s.GetUserProfileByID(ctx, newUser.ID)
 }

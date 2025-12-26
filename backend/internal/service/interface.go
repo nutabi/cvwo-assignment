@@ -15,4 +15,5 @@ type Service interface {
 	GetUserProfileByID(ctx context.Context, id uint) (*UserProfile, error)
 	GetCurrentUserProfile(ctx context.Context, user *model.User) (*UserProfile, error)
 	UpdateCurrentUserProfile(ctx context.Context, user *model.User, newAvatarUrl, newBio *string) error
+	RegisterUser(ctx context.Context, username, email, password string) (*UserProfile, error)
 }
