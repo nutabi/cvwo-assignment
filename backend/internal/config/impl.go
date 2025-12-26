@@ -54,6 +54,9 @@ func LoadConfig() (Config, error) {
 	cfg := config{
 		serverHostname: getRequired("SERVER_HOSTNAME"),
 		serverPort:     getRequiredInt("SERVER_PORT"),
+		databaseUrl:    getRequired("DATABASE_URL"),
+		jwtSecret:      getRequired("JWT_SECRET"),
+		debug:          getRequired("DEBUG") == "true",
 	}
 
 	if isBad {
