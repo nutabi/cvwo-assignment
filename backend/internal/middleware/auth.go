@@ -49,9 +49,13 @@ func NewAuthConfig(
 
 			// Fetch user from repository
 			user, err := repo.GetUserByUsername(c.Request.Context(), loginVals.Username)
+			if err != nil {
+				return nil, gin_jwt.ErrFailedAuthentication
+			}
 
 			// Validate user credentials
-			if err == nil && utility.VerifyPassword(loginVals.Password, user.PHC) {
+			passwordValid, err := utility.VerifyPassword(loginVals.Password, user.PHC)
+			if err == nil && passwordValid {
 				return user, nil
 			}
 			return nil, gin_jwt.ErrFailedAuthentication
