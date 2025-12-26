@@ -20,6 +20,13 @@ type App struct {
 }
 
 func Initialise(cfg config.Config) App {
+	// Set Gin mode
+	if cfg.IsDebug() {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// Initialise repository
 	// Only supporting SQLite for now
 	repo, err := repository.ConnectSQL(sqlite.Open(cfg.GetDSN()))
