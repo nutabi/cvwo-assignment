@@ -22,6 +22,38 @@ func ConnectSQL(dialect gorm.Dialector) (Repository, error) {
 	return &sqlRepository{db: *db}, nil
 }
 
+func (r *sqlRepository) Migrate() error {
+	// Migrate user
+	err := r.db.AutoMigrate(&model.User{})
+	if err != nil {
+		slog.Error("Failed to run migrations", "error", err)
+		return err
+	}
+
+	// Migrate topic
+	err = r.db.AutoMigrate(&model.Topic{})
+	if err != nil {
+		slog.Error("Failed to run migrations", "error", err)
+		return err
+	}
+
+	// Migrate post
+	err = r.db.AutoMigrate(&model.Post{})
+	if err != nil {
+		slog.Error("Failed to run migrations", "error", err)
+		return err
+	}
+
+	// Migrate comment
+	err = r.db.AutoMigrate(&model.Comment{})
+	if err != nil {
+		slog.Error("Failed to run migrations", "error", err)
+		return err
+	}
+
+	return nil
+}
+
 func (r *sqlRepository) GetUserByID(
 	ctx context.Context,
 	id uint,

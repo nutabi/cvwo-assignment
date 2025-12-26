@@ -34,6 +34,12 @@ func Initialise(cfg config.Config) App {
 		slog.Error("Failed to connect to database", "error", err)
 	}
 
+	// Run migrations
+	err = repo.Migrate()
+	if err != nil {
+		slog.Error("Failed to run migrations", "error", err)
+	}
+
 	// Initialise service layer
 	svc := service.Default(repo)
 
@@ -54,6 +60,10 @@ func Initialise(cfg config.Config) App {
 func (a *App) Start() {
 	// Initialise router
 	r := gin.New()
+
+	// Add logger and recovery middleware
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 
 	// Add routes
 	v1.RegisterRoutes(r.Group("/v1"), a.service, a.authMiddleware)
