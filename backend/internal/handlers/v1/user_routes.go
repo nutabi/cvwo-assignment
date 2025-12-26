@@ -84,8 +84,8 @@ func handleUpdateUserProfile(svc service.Service) func(c *gin.Context) {
 
 		// Parse request body
 		var updateReq struct {
-			AvatarUrl *string `json:"avatar_url"`
-			Bio       *string `json:"bio"`
+			AvatarUrl *string `form:"avatar_url" json:"avatar_url"`
+			Bio       *string `form:"bio" json:"bio"`
 		}
 		if err := c.ShouldBind(&updateReq); err != nil {
 			respondWithError(c, http.StatusUnprocessableEntity, "Invalid request body")
