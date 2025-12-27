@@ -37,10 +37,10 @@ func NewAuthConfig(
 		Timeout:          5 * time.Minute,    // Token valid for 5 minutes
 		MaxRefresh:       7 * 24 * time.Hour, // Refreshable for 7 days
 		Authenticator: func(c *gin.Context) (any, error) {
-			// Parse login credentials from request
+			// Parse login credentials from request (supports both JSON and form data)
 			var loginVals struct {
-				Username string `json:"username" binding:"required"`
-				Password string `json:"password" binding:"required"`
+				Username string `json:"username" form:"username" binding:"required"`
+				Password string `json:"password" form:"password" binding:"required"`
 			}
 			if err := c.ShouldBind(&loginVals); err != nil {
 				slog.Debug("Failed to bind login values", "error", err)
