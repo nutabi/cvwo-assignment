@@ -47,3 +47,15 @@ func retrievePaginationParams(c *gin.Context) (limit, offset int) {
 
 	return limit, offset
 }
+
+func getBoolParam(c *gin.Context, paramName string, defaultValue bool) (value bool) {
+	switch c.Query(paramName) {
+	case "1", "true":
+		value = true
+	case "0", "false":
+		value = false
+	default:
+		value = defaultValue
+	}
+	return value
+}
