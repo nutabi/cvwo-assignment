@@ -22,7 +22,7 @@ func RegisterRoutes(
 
 	// Add topic public routes
 	r.GET("/topics", handleListTopics(service))
-	r.GET("/topics/:id", handleGetTopicDetails(service))
+	r.GET("/topics/:id", handleGetTopicInfo(service))
 
 	protected := r.Group("", authMiddleware.MiddlewareFunc())
 

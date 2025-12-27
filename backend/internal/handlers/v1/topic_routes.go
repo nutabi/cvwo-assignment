@@ -23,8 +23,7 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 }
 
 // Handle GET /topics/:id
-func handleGetTopicDetails(svc service.Service) gin.HandlerFunc {
-	return nil
+func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 }
 
 // Handle PATCH /topics/:id
