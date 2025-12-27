@@ -17,11 +17,21 @@ func RegisterRoutes(
 	r.POST("/auth/refresh", authMiddleware.RefreshHandler)
 	r.POST("/auth/register", handleUserRegistration(service))
 
-	// Add public routes
+	// Add user public routes
 	r.GET("/users/:id", handlerPublicUserProfile(service))
 
-	// Add protected routes
+	// Add topic public routes
+	r.GET("/topics", handleListTopics(service))
+	r.GET("/topics/:id", handleGetTopicDetails(service))
+
 	protected := r.Group("", authMiddleware.MiddlewareFunc())
+
+	// Add user protected routes
 	protected.GET("/users/me", handleCurrentUserProfile(service))
 	protected.PUT("/users/me", handleUpdateUserProfile(service))
+
+	// Add topic protected routes
+	protected.POST("/topics", handleCreateTopic(service))
+	protected.PATCH("/topics/:id", handleUpdateTopic(service))
+	protected.DELETE("/topics/:id", handleDeleteTopic(service))
 }
