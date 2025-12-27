@@ -94,7 +94,8 @@ func (r *sqlRepository) CheckUsernameExists(
 	_, err := gorm.
 		G[model.User](&r.db).
 		Where("username = ?", username).
-		First(ctx)
+		Limit(1).
+		Find(ctx)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, nil
 	}
