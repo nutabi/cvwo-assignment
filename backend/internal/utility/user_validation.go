@@ -150,7 +150,7 @@ func ValidateUsername(username string) bool {
 		return false
 	}
 	for _, ch := range username {
-		if !(ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9') {
+		if !((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) {
 			return false
 		}
 	}
@@ -161,7 +161,7 @@ func ValidateUsername(username string) bool {
 // Try to parse user ID from string to uint
 func TryParseUserId(idStr string) (uint, bool) {
 	num, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
+	if err != nil || num < 0 {
 		return 0, false
 	}
 	return uint(num), true
