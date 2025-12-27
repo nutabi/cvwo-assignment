@@ -1,8 +1,13 @@
 package service
 
-import "time"
+import (
+	"time"
+
+	"github.com/nutabi/cvwo-assignment/backend/internal/model"
+)
 
 type UserProfile struct {
+	UserID    uint       `json:"user_id"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Username  string     `json:"username"`
@@ -15,10 +20,11 @@ type TopicInfo struct {
 	TopicID     uint        `json:"topic_id"`
 	CreatedAt   time.Time   `json:"created_at"`
 	UpdatedAt   time.Time   `json:"updated_at"`
-	Title       string      `json:"title"`
+	Name        string      `json:"name"`
 	Description string      `json:"description"`
 	Author      UserProfile `json:"author"`
-	Posts       []PostInfo  `json:"posts,omitempty"`
+
+	Posts []PostInfo `json:"posts,omitempty"`
 }
 
 type PostInfo struct {
@@ -27,16 +33,90 @@ type PostInfo struct {
 	UpdatedAt time.Time     `json:"updated_at"`
 	Title     string        `json:"title"`
 	Content   string        `json:"content"`
-	Author    *UserProfile  `json:"author,omitempty"`
-	Topic     *TopicInfo    `json:"topic,omitempty"`
+	Author    UserProfile   `json:"author"`
+	TopicID   uint          `json:"topic_id"`
 	Comments  []CommentInfo `json:"comments,omitempty"`
 }
 
 type CommentInfo struct {
-	CommentID uint         `json:"comment_id"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	Content   string       `json:"content"`
-	Author    *UserProfile `json:"author,omitempty"`
-	Post      *PostInfo    `json:"post,omitempty"`
+	CommentID uint        `json:"comment_id"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
+	Content   string      `json:"content"`
+	Author    UserProfile `json:"author"`
+	PostID    uint        `json:"post_id"`
+}
+
+func profileFromUser(user *model.User, isPrivate bool) UserProfile {
+	profile := UserProfile{
+		UserID:    user.ID,
+		CreatedAt: user.CreatedAt,
+		Username:  user.Username,
+		AvatarUrl: user.AvatarURL,
+		Bio:       user.Bio,
+	}
+	if isPrivate {
+		profile.UpdatedAt = &user.UpdatedAt
+		profile.Email = &user.Email
+	}
+	return profile
+}
+
+func infoFromTopic(topic *model.Topic, withPosts bool) TopicInfo {
+	// Handle nil description
+	desc := ""
+	if topic.Description != nil {
+		desc = *topic.Description
+	}
+
+	info := TopicInfo{
+		TopicID:     topic.ID,
+		CreatedAt:   topic.CreatedAt,
+		UpdatedAt:   topic.UpdatedAt,
+		Name:        topic.Name,
+		Description: desc,
+		Author:      profileFromUser(topic.Author, false),
+	}
+
+	// Handle posts if requested
+	if withPosts && topic.Posts != nil {
+		info.Posts = make([]PostInfo, 0, len(topic.Posts))
+		for _, post := range topic.Posts {
+			info.Posts = append(info.Posts, infoFromPost(post, false))
+		}
+	}
+	return info
+}
+
+func infoFromPost(post *model.Post, withComments bool) PostInfo {
+	info := PostInfo{
+		PostID:    post.ID,
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,
+		Title:     post.Title,
+		Content:   post.Content,
+		Author:    profileFromUser(post.Author, false),
+		TopicID:   post.TopicID,
+	}
+
+	// Handle comments if requested
+	if withComments && post.Comments != nil {
+		info.Comments = make([]CommentInfo, 0, len(post.Comments))
+		for _, comment := range post.Comments {
+			info.Comments = append(info.Comments, infoFromComment(comment))
+		}
+	}
+
+	return info
+}
+
+func infoFromComment(comment *model.Comment) CommentInfo {
+	return CommentInfo{
+		CommentID: comment.ID,
+		CreatedAt: comment.CreatedAt,
+		UpdatedAt: comment.UpdatedAt,
+		Content:   comment.Content,
+		Author:    profileFromUser(comment.Author, false),
+		PostID:    comment.PostID,
+	}
 }
