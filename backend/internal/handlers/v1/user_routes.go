@@ -11,7 +11,7 @@ import (
 )
 
 // Handle GET /users/:id
-func handlerPublicUserProfile(svc service.Service) func(c *gin.Context) {
+func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse user ID from path
 		userId, ok := utility.TryParseUserId(c.Param("id"))
@@ -33,7 +33,7 @@ func handlerPublicUserProfile(svc service.Service) func(c *gin.Context) {
 }
 
 // Handle GET /users/me
-func handleCurrentUserProfile(svc service.Service) func(c *gin.Context) {
+func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Since this is an authenticated route, retrieve user from context
 		user, exists := c.Get(middleware.UserIdentityKey)
@@ -64,7 +64,7 @@ func handleCurrentUserProfile(svc service.Service) func(c *gin.Context) {
 }
 
 // Handle PATCH /users/me
-func handleUpdateUserProfile(svc service.Service) func(c *gin.Context) {
+func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Since this is an authenticated route, retrieve user from context
 		user, exists := c.Get(middleware.UserIdentityKey)

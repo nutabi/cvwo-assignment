@@ -6,26 +6,33 @@ import (
 )
 
 // Handle GET /topics
-func handleListTopics(svc service.Service) func(c *gin.Context) {
+func handleListTopics(svc service.Service) gin.HandlerFunc {
 	return nil
+	return func(c *gin.Context) {
+		// Parse query parameters for pagination, filtering, etc. (if any)
+
+		// Delegate to service layer to get list of topics
+
+		// Respond with list of topics
+	}
 }
 
 // Handle POST /topics
-func handleCreateTopic(svc service.Service) func(c *gin.Context) {
+func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	return nil
 }
 
 // Handle GET /topics/:id
-func handleGetTopicDetails(svc service.Service) func(c *gin.Context) {
+func handleGetTopicDetails(svc service.Service) gin.HandlerFunc {
 	return nil
 }
 
 // Handle PATCH /topics/:id
-func handleUpdateTopic(svc service.Service) func(c *gin.Context) {
+func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	return nil
 }
 
 // Handle DELETE /topics/:id
-func handleDeleteTopic(svc service.Service) func(c *gin.Context) {
+func handleDeleteTopic(svc service.Service) gin.HandlerFunc {
 	return nil
 }

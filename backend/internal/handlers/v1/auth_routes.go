@@ -8,7 +8,7 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
 
-func handleUserRegistration(svc service.Service) func(c *gin.Context) {
+func handleUserRegistration(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse request body
 		var reqBody struct {
