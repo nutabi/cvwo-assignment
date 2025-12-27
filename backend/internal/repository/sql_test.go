@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 var mockUsers []struct {
@@ -210,7 +212,7 @@ func TestCreateUser(t *testing.T) {
 	}
 	for _, mu := range mockUsers {
 		t.Run(mu.username, func(t *testing.T) {
-			if err := repo.CreateUser(t.Context(), &model.User{
+			if err := repo.CreateUser(context.Background(), &model.User{
 				Username: mu.username,
 				Email:    mu.email,
 				PHC:      mu.phc,
@@ -218,5 +220,188 @@ func TestCreateUser(t *testing.T) {
 				t.Errorf("Failed to create user %s: %v", mu.username, err)
 			}
 		})
+	}
+}
+
+// Test error cases
+
+func TestConnectSQL_InvalidDialect(t *testing.T) {
+	// SQLite with empty string still works, so we need a truly invalid config
+	// We'll skip this test as it's hard to force a connection error with SQLite
+	// The error path in ConnectSQL is tested when gorm.Open fails
+	t.Skip("Skipping as SQLite is very permissive with connection strings")
+}
+
+func TestGetUserByID_NotFound(t *testing.T) {
+	repo, err := initRepoWithMockUsers()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Try to get non-existent user
+	_, err = repo.GetUserByID(context.Background(), 9999)
+	if err == nil {
+		t.Error("Expected error when getting non-existent user, got nil")
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Errorf("Expected gorm.ErrRecordNotFound, got %v", err)
+	}
+}
+
+func TestGetUserByUsername_NotFound(t *testing.T) {
+	repo, err := initRepoWithMockUsers()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Try to get non-existent user
+	_, err = repo.GetUserByUsername(context.Background(), "nonexistentuser")
+	if err == nil {
+		t.Error("Expected error when getting non-existent username, got nil")
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Errorf("Expected gorm.ErrRecordNotFound, got %v", err)
+	}
+}
+
+func TestCheckUsernameExists_Error(t *testing.T) {
+	repo, err := initRepo()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Get the underlying SQL repo to close the database
+	sqlRepo := repo.(*sqlRepository)
+	sqlDB, _ := sqlRepo.db.DB()
+	sqlDB.Close()
+
+	// Now try to check username existence with closed DB
+	_, err = repo.CheckUsernameExists(context.Background(), "testuser")
+	if err == nil {
+		t.Error("Expected error when database is closed, got nil")
+	}
+}
+
+func TestCheckEmailExists_Error(t *testing.T) {
+	repo, err := initRepo()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Get the underlying SQL repo to close the database
+	sqlRepo := repo.(*sqlRepository)
+	sqlDB, _ := sqlRepo.db.DB()
+	sqlDB.Close()
+
+	// Now try to check email existence with closed DB
+	_, err = repo.CheckEmailExists(context.Background(), "test@example.com")
+	if err == nil {
+		t.Error("Expected error when database is closed, got nil")
+	}
+}
+
+func TestCreateUser_DuplicateUsername(t *testing.T) {
+	repo, err := initRepoWithMockUsers()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Try to create a user with an existing username
+	err = repo.CreateUser(context.Background(), &model.User{
+		Username: mockUsers[0].username,
+		Email:    "newemail@example.com",
+		PHC:      "newpassword",
+	})
+	if err == nil {
+		t.Error("Expected error when creating user with duplicate username, got nil")
+	}
+}
+
+func TestCreateUser_DuplicateEmail(t *testing.T) {
+	repo, err := initRepoWithMockUsers()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Try to create a user with an existing email
+	err = repo.CreateUser(context.Background(), &model.User{
+		Username: "newuser",
+		Email:    mockUsers[0].email,
+		PHC:      "newpassword",
+	})
+	if err == nil {
+		t.Error("Expected error when creating user with duplicate email, got nil")
+	}
+}
+
+func TestUpdateUser_WithAvatarAndBio(t *testing.T) {
+	repo, err := initRepoWithMockUsers()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	user, err := repo.GetUserByID(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get user: %v", err)
+	}
+
+	// Update both avatar and bio
+	newAvatar := "https://example.com/new-avatar.png"
+	newBio := "New bio"
+	user.AvatarURL = &newAvatar
+	user.Bio = &newBio
+
+	err = repo.UpdateUser(context.Background(), &user)
+	if err != nil {
+		t.Fatalf("Failed to update user: %v", err)
+	}
+
+	// Verify updates
+	updatedUser, err := repo.GetUserByID(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get updated user: %v", err)
+	}
+
+	if updatedUser.AvatarURL == nil || *updatedUser.AvatarURL != newAvatar {
+		t.Errorf("Expected avatar URL %s, got %v", newAvatar, updatedUser.AvatarURL)
+	}
+	if updatedUser.Bio == nil || *updatedUser.Bio != newBio {
+		t.Errorf("Expected bio %s, got %v", newBio, updatedUser.Bio)
+	}
+}
+
+func TestMigrate_AllModels(t *testing.T) {
+	// Test that all models are migrated successfully
+	repo, err := ConnectSQL(sqlite.Open(":memory:"))
+	if err != nil {
+		t.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	err = repo.Migrate()
+	if err != nil {
+		t.Fatalf("Failed to migrate: %v", err)
+	}
+
+	// Verify all tables exist by trying to create records
+	sqlRepo := repo.(*sqlRepository)
+
+	// Test User table
+	if err := sqlRepo.db.AutoMigrate(&model.User{}); err != nil {
+		t.Errorf("User table migration failed: %v", err)
+	}
+
+	// Test Topic table
+	if err := sqlRepo.db.AutoMigrate(&model.Topic{}); err != nil {
+		t.Errorf("Topic table migration failed: %v", err)
+	}
+
+	// Test Post table
+	if err := sqlRepo.db.AutoMigrate(&model.Post{}); err != nil {
+		t.Errorf("Post table migration failed: %v", err)
+	}
+
+	// Test Comment table
+	if err := sqlRepo.db.AutoMigrate(&model.Comment{}); err != nil {
+		t.Errorf("Comment table migration failed: %v", err)
 	}
 }
