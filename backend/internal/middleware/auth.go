@@ -81,5 +81,10 @@ func NewAuthConfig(
 		CookieDomain:   serverDomain,
 		CookieName:     CookieName,
 		CookieSameSite: http.SameSiteDefaultMode,
+		Unauthorized: func(c *gin.Context, code int, message string) {
+			c.JSON(code, gin.H{
+				"error": message,
+			})
+		},
 	}
 }
