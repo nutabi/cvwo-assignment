@@ -50,6 +50,13 @@ func Initialise(cfg config.Config) App {
 		cfg.GetServerHostname(),
 		cfg.GetJWTSecretKey(),
 	)
+
+	// Initialize the JWT middleware
+	if err := auth.MiddlewareInit(); err != nil {
+		slog.Error("Failed to initialize JWT middleware", "error", err)
+		panic(err)
+	}
+
 	return App{
 		serverAddress:  cfg.GetServerAddress(),
 		service:        svc,
