@@ -117,5 +117,13 @@ func (s *defaultService) RegisterUser(ctx context.Context, username, email, pass
 	}
 
 	// Return the newly created user's profile
-	return s.GetUserProfileByID(ctx, newUser.ID)
+	userProfile := &UserProfile{
+		CreatedAt: newUser.CreatedAt,
+		UpdatedAt: &newUser.UpdatedAt,
+		Username:  newUser.Username,
+		Email:     &newUser.Email,
+		AvatarUrl: newUser.AvatarURL,
+		Bio:       newUser.Bio,
+	}
+	return userProfile, nil
 }
