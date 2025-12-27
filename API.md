@@ -26,6 +26,10 @@
 
     - [Get Topic Details](#get-topic-details)
 
+    - [Update Topic](#update-topic)
+
+    - [Delete Topic](#delete-topic)
+
 - [Posts](#posts)
 
     - [List Posts Inside a Topic](#list-posts-inside-a-topic)
