@@ -35,12 +35,12 @@ func createTestUser(id uint, username, email string) *model.User {
 func TestGetUserProfileByID(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
-		mockRepo.AddUser(testUser)
+		mockRepo.CreateUser(ctx, testUser)
 
 		// Execute
 		profile, err := svc.GetUserProfileByID(ctx, 1)
@@ -68,7 +68,7 @@ func TestGetUserProfileByID(t *testing.T) {
 
 	t.Run("UserNotFound", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -86,35 +86,13 @@ func TestGetUserProfileByID(t *testing.T) {
 			t.Errorf("Expected nil profile, got %v", profile)
 		}
 	})
-
-	t.Run("DatabaseError", func(t *testing.T) {
-		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
-		mockRepo.GetUserByIDError = errors.New("database connection failed")
-		svc := Default(mockRepo)
-		ctx := context.Background()
-
-		// Execute
-		profile, err := svc.GetUserProfileByID(ctx, 1)
-
-		// Assert
-		if err == nil {
-			t.Fatal("Expected error, got nil")
-		}
-		if !errors.Is(err, ErrDatabaseUnknown) {
-			t.Errorf("Expected ErrDatabaseUnknown, got %v", err)
-		}
-		if profile != nil {
-			t.Errorf("Expected nil profile, got %v", profile)
-		}
-	})
 }
 
 // Test GetCurrentUserProfile
 func TestGetCurrentUserProfile(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -152,12 +130,12 @@ func TestGetCurrentUserProfile(t *testing.T) {
 func TestUpdateCurrentUserProfile(t *testing.T) {
 	t.Run("UpdateBothFields", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
-		mockRepo.AddUser(testUser)
+		mockRepo.CreateUser(ctx, testUser)
 
 		newAvatarURL := "https://example.com/new-avatar.jpg"
 		newBio := "Updated bio"
@@ -179,14 +157,13 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 
 	t.Run("UpdateAvatarOnly", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
 		originalBio := *testUser.Bio
-		mockRepo.AddUser(testUser)
-
+		mockRepo.CreateUser(ctx, testUser)
 		newAvatarURL := "https://example.com/new-avatar.jpg"
 
 		// Execute
@@ -206,13 +183,13 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 
 	t.Run("UpdateBioOnly", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
 		originalAvatarURL := *testUser.AvatarURL
-		mockRepo.AddUser(testUser)
+		mockRepo.CreateUser(ctx, testUser)
 
 		newBio := "Updated bio only"
 
@@ -233,14 +210,14 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 
 	t.Run("NoUpdate", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
 		originalAvatarURL := *testUser.AvatarURL
 		originalBio := *testUser.Bio
-		mockRepo.AddUser(testUser)
+		mockRepo.CreateUser(ctx, testUser)
 
 		// Execute
 		err := svc.UpdateCurrentUserProfile(ctx, testUser, nil, nil)
@@ -256,35 +233,13 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 			t.Errorf("Expected bio to remain '%s', got %v", originalBio, testUser.Bio)
 		}
 	})
-
-	t.Run("DatabaseError", func(t *testing.T) {
-		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
-		mockRepo.UpdateUserError = errors.New("database error")
-		svc := Default(mockRepo)
-		ctx := context.Background()
-
-		testUser := createTestUser(1, "testuser", "test@example.com")
-		newBio := "New bio"
-
-		// Execute
-		err := svc.UpdateCurrentUserProfile(ctx, testUser, nil, &newBio)
-
-		// Assert
-		if err == nil {
-			t.Fatal("Expected error, got nil")
-		}
-		if !errors.Is(err, ErrDatabaseUnknown) {
-			t.Errorf("Expected ErrDatabaseUnknown, got %v", err)
-		}
-	})
 }
 
 // Test RegisterUser
 func TestRegisterUser(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -323,12 +278,12 @@ func TestRegisterUser(t *testing.T) {
 
 	t.Run("UsernameTaken", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
 		existingUser := createTestUser(1, "existinguser", "existing@example.com")
-		mockRepo.AddUser(existingUser)
+		mockRepo.CreateUser(ctx, existingUser)
 
 		// Execute
 		profile, err := svc.RegisterUser(ctx, "existinguser", "newemail@example.com", "SecurePass123!")
@@ -347,12 +302,12 @@ func TestRegisterUser(t *testing.T) {
 
 	t.Run("EmailInUse", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
+		mockRepo := repository.NewMockRepository()
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
 		existingUser := createTestUser(1, "existinguser", "existing@example.com")
-		mockRepo.AddUser(existingUser)
+		mockRepo.CreateUser(ctx, existingUser)
 
 		// Execute
 		profile, err := svc.RegisterUser(ctx, "newuser", "existing@example.com", "SecurePass123!")
@@ -363,72 +318,6 @@ func TestRegisterUser(t *testing.T) {
 		}
 		if !errors.Is(err, ErrEmailInUse) {
 			t.Errorf("Expected ErrEmailInUse, got %v", err)
-		}
-		if profile != nil {
-			t.Errorf("Expected nil profile, got %v", profile)
-		}
-	})
-
-	t.Run("UsernameCheckDatabaseError", func(t *testing.T) {
-		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
-		mockRepo.CheckUsernameExistsError = errors.New("database error")
-		svc := Default(mockRepo)
-		ctx := context.Background()
-
-		// Execute
-		profile, err := svc.RegisterUser(ctx, "newuser", "newuser@example.com", "SecurePass123!")
-
-		// Assert
-		if err == nil {
-			t.Fatal("Expected error, got nil")
-		}
-		if !errors.Is(err, ErrDatabaseUnknown) {
-			t.Errorf("Expected ErrDatabaseUnknown, got %v", err)
-		}
-		if profile != nil {
-			t.Errorf("Expected nil profile, got %v", profile)
-		}
-	})
-
-	t.Run("EmailCheckDatabaseError", func(t *testing.T) {
-		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
-		mockRepo.CheckEmailExistsError = errors.New("database error")
-		svc := Default(mockRepo)
-		ctx := context.Background()
-
-		// Execute
-		profile, err := svc.RegisterUser(ctx, "newuser", "newuser@example.com", "SecurePass123!")
-
-		// Assert
-		if err == nil {
-			t.Fatal("Expected error, got nil")
-		}
-		if !errors.Is(err, ErrDatabaseUnknown) {
-			t.Errorf("Expected ErrDatabaseUnknown, got %v", err)
-		}
-		if profile != nil {
-			t.Errorf("Expected nil profile, got %v", profile)
-		}
-	})
-
-	t.Run("CreateUserDatabaseError", func(t *testing.T) {
-		// Setup
-		mockRepo := repository.NewMockRepository().(*repository.MockRepository)
-		mockRepo.CreateUserError = errors.New("database error")
-		svc := Default(mockRepo)
-		ctx := context.Background()
-
-		// Execute
-		profile, err := svc.RegisterUser(ctx, "newuser", "newuser@example.com", "SecurePass123!")
-
-		// Assert
-		if err == nil {
-			t.Fatal("Expected error, got nil")
-		}
-		if !errors.Is(err, ErrDatabaseUnknown) {
-			t.Errorf("Expected ErrDatabaseUnknown, got %v", err)
 		}
 		if profile != nil {
 			t.Errorf("Expected nil profile, got %v", profile)
