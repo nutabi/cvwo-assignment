@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
@@ -91,35 +90,30 @@ func (r *sqlRepository) CheckUsernameExists(
 	ctx context.Context,
 	username string,
 ) (bool, error) {
-	_, err := gorm.
+	users, err := gorm.
 		G[model.User](&r.db).
 		Where("username = ?", username).
 		Limit(1).
 		Find(ctx)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, nil
-	}
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return len(users) > 0, nil
 }
 
 func (r *sqlRepository) CheckEmailExists(
 	ctx context.Context,
 	email string,
 ) (bool, error) {
-	_, err := gorm.
+	users, err := gorm.
 		G[model.User](&r.db).
 		Where("email = ?", email).
-		First(ctx)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, nil
-	}
+		Limit(1).
+		Find(ctx)
 	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return len(users) > 0, nil
 }
 
 func (r *sqlRepository) CreateUser(
