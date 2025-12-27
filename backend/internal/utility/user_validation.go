@@ -158,8 +158,8 @@ func ValidateUsername(username string) bool {
 	return true
 }
 
-// Try to parse user ID from string to uint
-func TryParseUserId(idStr string) (uint, bool) {
+// Try to parse ID from string to uint
+func TryParseID(idStr string) (uint, bool) {
 	num, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || num < 0 {
 		return 0, false

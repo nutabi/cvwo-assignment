@@ -355,7 +355,7 @@ func TestValidateUsername(t *testing.T) {
 	}
 }
 
-func TestTryParseUserId(t *testing.T) {
+func TestTryParseID(t *testing.T) {
 	tests := []struct {
 		name   string
 		idStr  string
@@ -420,12 +420,12 @@ func TestTryParseUserId(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotId, gotOk := TryParseUserId(tt.idStr)
+			gotId, gotOk := TryParseID(tt.idStr)
 			if gotOk != tt.wantOk {
-				t.Errorf("TryParseUserId(%q) ok = %v, want %v", tt.idStr, gotOk, tt.wantOk)
+				t.Errorf("TryParseID(%q) ok = %v, want %v", tt.idStr, gotOk, tt.wantOk)
 			}
 			if gotId != tt.wantId {
-				t.Errorf("TryParseUserId(%q) id = %v, want %v", tt.idStr, gotId, tt.wantId)
+				t.Errorf("TryParseID(%q) id = %v, want %v", tt.idStr, gotId, tt.wantId)
 			}
 		})
 	}

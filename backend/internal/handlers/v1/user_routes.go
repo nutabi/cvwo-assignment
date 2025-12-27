@@ -14,7 +14,7 @@ import (
 func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse user ID from path
-		userId, ok := utility.TryParseUserId(c.Param("id"))
+		userId, ok := utility.TryParseID(c.Param("id"))
 		if !ok {
 			respondWithError(c, http.StatusUnprocessableEntity, "Invalid ID format")
 			return
