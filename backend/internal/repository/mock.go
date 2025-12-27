@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
+	"gorm.io/gorm"
 )
 
 // MockRepository is a mock implementation of the Repository interface for testing
@@ -53,7 +54,7 @@ func (m *MockRepository) GetUserByID(ctx context.Context, id uint) (model.User, 
 
 	user, exists := m.Users[id]
 	if !exists {
-		return model.User{}, errors.New("user not found")
+		return model.User{}, gorm.ErrRecordNotFound
 	}
 
 	return *user, nil
@@ -67,7 +68,7 @@ func (m *MockRepository) GetUserByUsername(ctx context.Context, username string)
 
 	userID, exists := m.UsernameToID[username]
 	if !exists {
-		return model.User{}, errors.New("user not found")
+		return model.User{}, gorm.ErrRecordNotFound
 	}
 
 	user := m.Users[userID]
