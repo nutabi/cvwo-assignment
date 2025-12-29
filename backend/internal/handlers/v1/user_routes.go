@@ -10,7 +10,7 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
 
-// Handle GET /users/:id
+// Handle GET /{ROOT}/users/:id
 func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse user ID from path
@@ -32,7 +32,7 @@ func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle GET /users/me
+// Handle GET /{ROOT}/users/me
 func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Since this is an authenticated route, retrieve user from context
@@ -63,7 +63,7 @@ func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle PATCH /users/me
+// Handle PATCH /{ROOT}/users/me
 func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Since this is an authenticated route, retrieve user from context

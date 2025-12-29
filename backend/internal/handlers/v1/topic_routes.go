@@ -10,7 +10,7 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
 
-// Handle GET /topics
+// Handle GET /{ROOT}/topics
 func handleListTopics(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse query parameters for pagination
@@ -44,7 +44,7 @@ func handleListTopics(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle POST /topics
+// Handle POST /{ROOT}/topics
 func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -88,7 +88,7 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle GET /topics/:id
+// Handle GET /{ROOT}/topics/:id
 func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Parse topic ID from path
@@ -113,7 +113,7 @@ func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle PATCH /topics/:id
+// Handle PATCH /{ROOT}/topics/:id
 func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -164,7 +164,7 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle DELETE /topics/:id
+// Handle DELETE /{ROOT}/topics/:id
 func handleDeleteTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
