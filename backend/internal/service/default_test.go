@@ -8,8 +8,20 @@ import (
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
+func createMockRepository() (repository.Repository, error) {
+	repo, err := repository.ConnectSQL(sqlite.Open(":memory:"))
+	if err != nil {
+		return nil, err
+	}
+	if err := repo.Migrate(); err != nil {
+		return nil, err
+	}
+	return repo, nil
+}
 
 // Helper function to create a test user
 func createTestUser(id uint, username, email string) *model.User {
@@ -35,7 +47,10 @@ func createTestUser(id uint, username, email string) *model.User {
 func TestGetUserProfileByID(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -68,7 +83,10 @@ func TestGetUserProfileByID(t *testing.T) {
 
 	t.Run("UserNotFound", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -92,7 +110,10 @@ func TestGetUserProfileByID(t *testing.T) {
 func TestGetCurrentUserProfile(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -130,7 +151,10 @@ func TestGetCurrentUserProfile(t *testing.T) {
 func TestUpdateCurrentUserProfile(t *testing.T) {
 	t.Run("UpdateBothFields", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -141,7 +165,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		newBio := "Updated bio"
 
 		// Execute
-		err := svc.UpdateCurrentUserProfile(ctx, testUser, &newAvatarURL, &newBio)
+		err = svc.UpdateCurrentUserProfile(ctx, testUser, &newAvatarURL, &newBio)
 
 		// Assert
 		if err != nil {
@@ -157,7 +181,10 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 
 	t.Run("UpdateAvatarOnly", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -167,7 +194,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		newAvatarURL := "https://example.com/new-avatar.jpg"
 
 		// Execute
-		err := svc.UpdateCurrentUserProfile(ctx, testUser, &newAvatarURL, nil)
+		err = svc.UpdateCurrentUserProfile(ctx, testUser, &newAvatarURL, nil)
 
 		// Assert
 		if err != nil {
@@ -183,7 +210,10 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 
 	t.Run("UpdateBioOnly", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -194,7 +224,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		newBio := "Updated bio only"
 
 		// Execute
-		err := svc.UpdateCurrentUserProfile(ctx, testUser, nil, &newBio)
+		err = svc.UpdateCurrentUserProfile(ctx, testUser, nil, &newBio)
 
 		// Assert
 		if err != nil {
@@ -210,7 +240,10 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 
 	t.Run("NoUpdate", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -220,7 +253,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		mockRepo.CreateUser(ctx, testUser)
 
 		// Execute
-		err := svc.UpdateCurrentUserProfile(ctx, testUser, nil, nil)
+		err = svc.UpdateCurrentUserProfile(ctx, testUser, nil, nil)
 
 		// Assert
 		if err != nil {
@@ -239,7 +272,10 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 func TestRegisterUser(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -278,7 +314,10 @@ func TestRegisterUser(t *testing.T) {
 
 	t.Run("UsernameTaken", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -302,7 +341,10 @@ func TestRegisterUser(t *testing.T) {
 
 	t.Run("EmailInUse", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 		ctx := context.Background()
 
@@ -329,7 +371,10 @@ func TestRegisterUser(t *testing.T) {
 func TestRepo(t *testing.T) {
 	t.Run("ReturnsRepository", func(t *testing.T) {
 		// Setup
-		mockRepo := repository.NewMockRepository()
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
 		svc := Default(mockRepo)
 
 		// Execute
