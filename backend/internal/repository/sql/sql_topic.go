@@ -14,7 +14,11 @@ func (r *sqlRepository) GetTopics(
 	withPosts bool,
 ) ([]model.Topic, error) {
 	// Base query
-	query := gorm.G[model.Topic](&r.db).Offset(offset).Limit(limit)
+	query := gorm.
+		G[model.Topic](&r.db).
+		Preload("Author", nil).
+		Offset(offset).
+		Limit(limit)
 
 	// Filter by userID if provided
 	if userID != nil {
@@ -54,6 +58,7 @@ func (r *sqlRepository) GetTopicByID(
 ) (model.Topic, error) {
 	topic, err := gorm.
 		G[model.Topic](&r.db).
+		Preload("Author", nil).
 		Where("id = ?", id).
 		First(ctx)
 	return topic, err
