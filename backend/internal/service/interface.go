@@ -21,8 +21,8 @@ type Service interface {
 	// Topic-related services
 
 	CreateTopic(ctx context.Context, user *model.User, title string, description *string) (*TopicInfo, error)
-	FetchTopicByID(ctx context.Context, topicID uint) (*TopicInfo, error)
 	FetchTopics(ctx context.Context, limit, offset int, userID uint, withPosts bool) ([]TopicInfo, error)
+	FetchTopicByID(ctx context.Context, topicID uint) (*TopicInfo, error)
 	UpdateTopic(ctx context.Context, topicID, userID uint, title, description *string) error
 	DeleteTopic(ctx context.Context, topicID, userID uint) error
 }
