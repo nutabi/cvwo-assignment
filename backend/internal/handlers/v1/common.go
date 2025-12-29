@@ -21,7 +21,17 @@ func handleServiceError(c *gin.Context, err error) {
 			respondWithError(c, http.StatusConflict, err.Error())
 		} else if errors.Is(err, service.ErrEmailInUse) {
 			respondWithError(c, http.StatusConflict, err.Error())
+		} else if errors.Is(err, service.ErrTopicNotFound) {
+			respondWithError(c, http.StatusNotFound, err.Error())
+		} else if errors.Is(err, service.ErrUnauthorized) {
+			respondWithError(c, http.StatusUnauthorized, err.Error())
+		} else if errors.Is(err, service.ErrNoUpdateFields) {
+			respondWithError(c, http.StatusUnprocessableEntity, err.Error())
 		} else {
+			// Generic internal server error for unhandled cases
+			// as well as the following errors:
+			// - ErrCryptoError
+			// - ErrDatabaseError
 			respondWithError(c, http.StatusInternalServerError, "Internal server error")
 		}
 		return
