@@ -142,7 +142,7 @@ func (s *primaryService) DeleteTopic(
 	}
 
 	// Delete topic via repository
-	if err := s.repo.DeleteTopic(ctx, topicID); err != nil {
+	if err := s.repo.DeleteTopic(ctx, &topic); err != nil {
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 

@@ -18,7 +18,7 @@ func (r *sqlRepository) GetTopics(
 
 	// Filter by userID if provided
 	if userID != nil {
-		query = query.Where("user_id = ?", *userID)
+		query = query.Where("author_id = ?", *userID)
 	}
 
 	// Preload posts if requested
@@ -72,11 +72,11 @@ func (r *sqlRepository) UpdateTopic(
 
 func (r *sqlRepository) DeleteTopic(
 	ctx context.Context,
-	topicID uint,
+	topic *model.Topic,
 ) error {
 	_, err := gorm.
 		G[model.Topic](&r.db).
-		Where("id = ?", topicID).
+		Where("id = ?", topic.ID).
 		Delete(ctx)
 	return err
 }

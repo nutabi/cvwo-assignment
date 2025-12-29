@@ -24,5 +24,5 @@ type Repository interface {
 	GetTopicByID(ctx context.Context, id uint) (model.Topic, error)
 	GetTopics(ctx context.Context, limit, offset int, userID *uint, withPosts bool) ([]model.Topic, error)
 	UpdateTopic(ctx context.Context, topic *model.Topic) error
-	DeleteTopic(ctx context.Context, topicID uint) error
+	DeleteTopic(ctx context.Context, topic *model.Topic) error
 }
