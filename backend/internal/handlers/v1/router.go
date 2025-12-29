@@ -24,6 +24,10 @@ func RegisterRoutes(
 	r.GET("/topics", handleListTopics(service))
 	r.GET("/topics/:id", handleGetTopicInfo(service))
 
+	// Add post public routes
+	r.GET("/topics/:id/posts", handleListPosts(service))
+	r.GET("/posts/:id", handleGetPostInfo(service))
+
 	protected := r.Group("", authMiddleware.MiddlewareFunc())
 
 	// Add user protected routes
@@ -34,4 +38,9 @@ func RegisterRoutes(
 	protected.POST("/topics", handleCreateTopic(service))
 	protected.PATCH("/topics/:id", handleUpdateTopic(service))
 	protected.DELETE("/topics/:id", handleDeleteTopic(service))
+
+	// Add post protected routes
+	protected.POST("/topics/:id/posts", handleCreatePost(service))
+	protected.PATCH("/posts/:id", handleUpdatePost(service))
+	protected.DELETE("/posts/:id", handleDeletePost(service))
 }
