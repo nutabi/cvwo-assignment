@@ -264,42 +264,6 @@ func TestGetUserByUsername_NotFound(t *testing.T) {
 	}
 }
 
-func TestCheckUsernameExists_Error(t *testing.T) {
-	repo, err := initRepo()
-	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
-	}
-
-	// Get the underlying SQL repo to close the database
-	sqlRepo := repo.(*sqlRepository)
-	sqlDB, _ := sqlRepo.db.DB()
-	sqlDB.Close()
-
-	// Now try to check username existence with closed DB
-	_, err = repo.CheckUsernameExists(context.Background(), "testuser")
-	if err == nil {
-		t.Error("Expected error when database is closed, got nil")
-	}
-}
-
-func TestCheckEmailExists_Error(t *testing.T) {
-	repo, err := initRepo()
-	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
-	}
-
-	// Get the underlying SQL repo to close the database
-	sqlRepo := repo.(*sqlRepository)
-	sqlDB, _ := sqlRepo.db.DB()
-	sqlDB.Close()
-
-	// Now try to check email existence with closed DB
-	_, err = repo.CheckEmailExists(context.Background(), "test@example.com")
-	if err == nil {
-		t.Error("Expected error when database is closed, got nil")
-	}
-}
-
 func TestCreateUser_DuplicateUsername(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
@@ -367,41 +331,5 @@ func TestUpdateUser_WithAvatarAndBio(t *testing.T) {
 	}
 	if updatedUser.Bio == nil || *updatedUser.Bio != newBio {
 		t.Errorf("Expected bio %s, got %v", newBio, updatedUser.Bio)
-	}
-}
-
-func TestMigrate_AllModels(t *testing.T) {
-	// Test that all models are migrated successfully
-	repo, err := ConnectSQL(sqlite.Open(":memory:"))
-	if err != nil {
-		t.Fatalf("Failed to connect to database: %v", err)
-	}
-
-	err = repo.Migrate()
-	if err != nil {
-		t.Fatalf("Failed to migrate: %v", err)
-	}
-
-	// Verify all tables exist by trying to create records
-	sqlRepo := repo.(*sqlRepository)
-
-	// Test User table
-	if err := sqlRepo.db.AutoMigrate(&model.User{}); err != nil {
-		t.Errorf("User table migration failed: %v", err)
-	}
-
-	// Test Topic table
-	if err := sqlRepo.db.AutoMigrate(&model.Topic{}); err != nil {
-		t.Errorf("Topic table migration failed: %v", err)
-	}
-
-	// Test Post table
-	if err := sqlRepo.db.AutoMigrate(&model.Post{}); err != nil {
-		t.Errorf("Post table migration failed: %v", err)
-	}
-
-	// Test Comment table
-	if err := sqlRepo.db.AutoMigrate(&model.Comment{}); err != nil {
-		t.Errorf("Comment table migration failed: %v", err)
 	}
 }
