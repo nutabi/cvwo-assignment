@@ -8,7 +8,7 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/config"
 	v1 "github.com/nutabi/cvwo-assignment/backend/internal/handlers/v1"
 	"github.com/nutabi/cvwo-assignment/backend/internal/middleware"
-	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
+	"github.com/nutabi/cvwo-assignment/backend/internal/repository/sql"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service/primary"
 	"gorm.io/driver/sqlite"
@@ -30,7 +30,7 @@ func Initialise(cfg config.Config) App {
 
 	// Initialise repository
 	// Only supporting SQLite for now
-	repo, err := repository.ConnectSQL(sqlite.Open(cfg.GetDSN()))
+	repo, err := sql.Connect(sqlite.Open(cfg.GetDSN()))
 	if err != nil {
 		slog.Error("Failed to connect to database", "error", err)
 	}

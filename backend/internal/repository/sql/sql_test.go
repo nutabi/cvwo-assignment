@@ -1,4 +1,4 @@
-package repository
+package sql_test
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
+	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
+	"github.com/nutabi/cvwo-assignment/backend/internal/repository/sql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -28,8 +30,8 @@ var mockUsers []struct {
 	{"test3", "test3@example.com", "test3password", "http://example.com/avatar3.png", "Bio of test3"},
 }
 
-func initRepo() (Repository, error) {
-	repo, err := ConnectSQL(sqlite.Open(":memory:"))
+func initRepo() (repository.Repository, error) {
+	repo, err := sql.Connect(sqlite.Open(":memory:"))
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +41,7 @@ func initRepo() (Repository, error) {
 	return repo, nil
 }
 
-func addMockUser(repo Repository, username, email, phc string) error {
+func addMockUser(repo repository.Repository, username, email, phc string) error {
 	user := &model.User{
 		Username: username,
 		Email:    email,
@@ -48,7 +50,7 @@ func addMockUser(repo Repository, username, email, phc string) error {
 	return repo.CreateUser(context.Background(), user)
 }
 
-func initRepoWithMockUsers() (Repository, error) {
+func initRepoWithMockUsers() (repository.Repository, error) {
 	repo, err := initRepo()
 	if err != nil {
 		return nil, err

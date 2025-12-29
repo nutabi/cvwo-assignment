@@ -8,6 +8,7 @@ import (
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
+	"github.com/nutabi/cvwo-assignment/backend/internal/repository/sql"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service/primary"
 	"gorm.io/driver/sqlite"
@@ -15,7 +16,7 @@ import (
 )
 
 func createMockRepository() (repository.Repository, error) {
-	repo, err := repository.ConnectSQL(sqlite.Open(":memory:"))
+	repo, err := sql.Connect(sqlite.Open(":memory:"))
 	if err != nil {
 		return nil, err
 	}
