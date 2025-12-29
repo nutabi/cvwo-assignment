@@ -47,7 +47,7 @@ type CommentInfo struct {
 	PostID    uint        `json:"post_id"`
 }
 
-func profileFromUser(user *model.User, isPrivate bool) UserProfile {
+func ProfileFromUser(user *model.User, isPrivate bool) UserProfile {
 	profile := UserProfile{
 		UserID:    user.ID,
 		CreatedAt: user.CreatedAt,
@@ -62,7 +62,7 @@ func profileFromUser(user *model.User, isPrivate bool) UserProfile {
 	return profile
 }
 
-func infoFromTopic(topic *model.Topic, withPosts bool) TopicInfo {
+func InfoFromTopic(topic *model.Topic, withPosts bool) TopicInfo {
 	// Handle nil description
 	desc := ""
 	if topic.Description != nil {
@@ -75,27 +75,27 @@ func infoFromTopic(topic *model.Topic, withPosts bool) TopicInfo {
 		UpdatedAt:   topic.UpdatedAt,
 		Name:        topic.Name,
 		Description: desc,
-		Author:      profileFromUser(topic.Author, false),
+		Author:      ProfileFromUser(topic.Author, false),
 	}
 
 	// Handle posts if requested
 	if withPosts && topic.Posts != nil {
 		info.Posts = make([]PostInfo, 0, len(topic.Posts))
 		for _, post := range topic.Posts {
-			info.Posts = append(info.Posts, infoFromPost(post, false))
+			info.Posts = append(info.Posts, InfoFromPost(post, false))
 		}
 	}
 	return info
 }
 
-func infoFromPost(post *model.Post, withComments bool) PostInfo {
+func InfoFromPost(post *model.Post, withComments bool) PostInfo {
 	info := PostInfo{
 		PostID:    post.ID,
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
 		Title:     post.Title,
 		Content:   post.Content,
-		Author:    profileFromUser(post.Author, false),
+		Author:    ProfileFromUser(post.Author, false),
 		TopicID:   post.TopicID,
 	}
 
@@ -103,20 +103,20 @@ func infoFromPost(post *model.Post, withComments bool) PostInfo {
 	if withComments && post.Comments != nil {
 		info.Comments = make([]CommentInfo, 0, len(post.Comments))
 		for _, comment := range post.Comments {
-			info.Comments = append(info.Comments, infoFromComment(comment))
+			info.Comments = append(info.Comments, InfoFromComment(comment))
 		}
 	}
 
 	return info
 }
 
-func infoFromComment(comment *model.Comment) CommentInfo {
+func InfoFromComment(comment *model.Comment) CommentInfo {
 	return CommentInfo{
 		CommentID: comment.ID,
 		CreatedAt: comment.CreatedAt,
 		UpdatedAt: comment.UpdatedAt,
 		Content:   comment.Content,
-		Author:    profileFromUser(comment.Author, false),
+		Author:    ProfileFromUser(comment.Author, false),
 		PostID:    comment.PostID,
 	}
 }

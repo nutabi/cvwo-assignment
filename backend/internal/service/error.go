@@ -5,8 +5,27 @@ import (
 )
 
 var (
-	ErrUserNotFound    = errors.New("user not found")
-	ErrUsernameTaken   = errors.New("username taken")
-	ErrEmailInUse      = errors.New("email in use")
-	ErrDatabaseUnknown = errors.New("unknown database error")
+	// Cryptographic errors
+	ErrCryptoError = errors.New("cryptographic error")
+
+	// Database errors
+	ErrDatabaseError = errors.New("unknown database error")
+
+	// Email in use error
+	ErrEmailInUse = errors.New("email in use")
+
+	// No updated fields error
+	ErrNoUpdateFields = errors.New("no fields to update")
+
+	// Topic not found error
+	ErrTopicNotFound = errors.New("topic not found")
+
+	// Unauthorized access error
+	ErrUnauthorized = errors.New("unauthorized access")
+
+	// User not found error
+	ErrUserNotFound = errors.New("user not found")
+
+	// Username taken error
+	ErrUsernameTaken = errors.New("username taken")
 )

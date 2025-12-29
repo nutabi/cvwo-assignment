@@ -10,6 +10,7 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/middleware"
 	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
+	"github.com/nutabi/cvwo-assignment/backend/internal/service/primary"
 	"gorm.io/driver/sqlite"
 )
 
@@ -41,7 +42,7 @@ func Initialise(cfg config.Config) App {
 	}
 
 	// Initialise service layer
-	svc := service.Default(repo)
+	svc := primary.NewService(repo)
 
 	// Initialise middleware
 	auth := middleware.NewAuthConfig(

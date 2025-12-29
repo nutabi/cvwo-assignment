@@ -12,8 +12,17 @@ type Service interface {
 	Repo() repository.Repository
 
 	// User-related services
+
+	RegisterUser(ctx context.Context, username, email, password string) (*UserProfile, error)
 	GetUserProfileByID(ctx context.Context, id uint) (*UserProfile, error)
 	GetCurrentUserProfile(ctx context.Context, user *model.User) (*UserProfile, error)
 	UpdateCurrentUserProfile(ctx context.Context, user *model.User, newAvatarUrl, newBio *string) error
-	RegisterUser(ctx context.Context, username, email, password string) (*UserProfile, error)
+
+	// Topic-related services
+
+	CreateTopic(ctx context.Context, user *model.User, title string, description *string) (*TopicInfo, error)
+	ListTopics(ctx context.Context, limit, offset int, userID uint, withPosts bool) ([]TopicInfo, error)
+	GetTopicInfoByID(ctx context.Context, topicID uint) (*TopicInfo, error)
+	UpdateTopic(ctx context.Context, topicID, userID uint, title, description *string) error
+	DeleteTopic(ctx context.Context, topicID, userID uint) error
 }

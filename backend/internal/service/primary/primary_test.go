@@ -1,4 +1,4 @@
-package service
+package primary_test
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/repository"
+	"github.com/nutabi/cvwo-assignment/backend/internal/service"
+	"github.com/nutabi/cvwo-assignment/backend/internal/service/primary"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -51,7 +53,7 @@ func TestGetUserProfileByID(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
@@ -87,7 +89,7 @@ func TestGetUserProfileByID(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		// Execute
@@ -97,7 +99,7 @@ func TestGetUserProfileByID(t *testing.T) {
 		if err == nil {
 			t.Fatal("Expected error, got nil")
 		}
-		if !errors.Is(err, ErrUserNotFound) {
+		if !errors.Is(err, service.ErrUserNotFound) {
 			t.Errorf("Expected ErrUserNotFound, got %v", err)
 		}
 		if profile != nil {
@@ -114,7 +116,7 @@ func TestGetCurrentUserProfile(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "currentuser", "current@example.com")
@@ -155,7 +157,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
@@ -185,7 +187,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
@@ -214,7 +216,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
@@ -244,7 +246,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		testUser := createTestUser(1, "testuser", "test@example.com")
@@ -276,7 +278,7 @@ func TestRegisterUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		// Execute
@@ -318,7 +320,7 @@ func TestRegisterUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		existingUser := createTestUser(1, "existinguser", "existing@example.com")
@@ -331,7 +333,7 @@ func TestRegisterUser(t *testing.T) {
 		if err == nil {
 			t.Fatal("Expected error, got nil")
 		}
-		if !errors.Is(err, ErrUsernameTaken) {
+		if !errors.Is(err, service.ErrUsernameTaken) {
 			t.Errorf("Expected ErrUsernameTaken, got %v", err)
 		}
 		if profile != nil {
@@ -345,7 +347,7 @@ func TestRegisterUser(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 		ctx := context.Background()
 
 		existingUser := createTestUser(1, "existinguser", "existing@example.com")
@@ -358,7 +360,7 @@ func TestRegisterUser(t *testing.T) {
 		if err == nil {
 			t.Fatal("Expected error, got nil")
 		}
-		if !errors.Is(err, ErrEmailInUse) {
+		if !errors.Is(err, service.ErrEmailInUse) {
 			t.Errorf("Expected ErrEmailInUse, got %v", err)
 		}
 		if profile != nil {
@@ -375,7 +377,7 @@ func TestRepo(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create mock repository: %v", err)
 		}
-		svc := Default(mockRepo)
+		svc := primary.NewService(mockRepo)
 
 		// Execute
 		repo := svc.Repo()
