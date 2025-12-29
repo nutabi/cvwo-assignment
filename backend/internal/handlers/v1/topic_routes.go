@@ -27,7 +27,7 @@ func handleListTopics(svc service.Service) gin.HandlerFunc {
 		withPosts := getBoolParam(c, "with_posts", false)
 
 		// Delegate to service layer to get list of topics
-		topics, err := svc.ListTopics(
+		topics, err := svc.FetchTopics(
 			c.Request.Context(),
 			limit,
 			offset,
@@ -99,7 +99,7 @@ func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Delegate to service layer to get topic details
-		topic, err := svc.GetTopicInfoByID(
+		topic, err := svc.FetchTopicByID(
 			ctx.Request.Context(),
 			topicId,
 		)

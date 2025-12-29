@@ -9,7 +9,49 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *primaryService) ListTopics(
+func (s *primaryService) CreateTopic(
+	ctx context.Context,
+	user *model.User,
+	title string,
+	description *string,
+) (*service.TopicInfo, error) {
+	// Create new topic model
+	newTopic := model.Topic{
+		Name:        title,
+		Description: description,
+		AuthorID:    user.ID,
+	}
+
+	// Save new topic via repository
+	if err := s.repo.CreateTopic(ctx, &newTopic); err != nil {
+		return nil, errors.Join(service.ErrDatabaseError, err)
+	}
+
+	// Return the newly created topic's info
+	info := service.InfoFromTopic(&newTopic, false)
+	return &info, nil
+}
+
+func (s *primaryService) FetchTopicByID(
+	ctx context.Context,
+	topicID uint,
+) (*service.TopicInfo, error) {
+	// Fetch topic from repository
+	topic, err := s.repo.GetTopicByID(ctx, topicID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, service.ErrTopicNotFound
+		} else {
+			return nil, errors.Join(service.ErrDatabaseError, err)
+		}
+	}
+
+	// Convert to DTO
+	info := service.InfoFromTopic(&topic, true)
+	return &info, nil
+}
+
+func (s *primaryService) FetchTopics(
 	ctx context.Context,
 	limit,
 	offset int,
@@ -34,48 +76,6 @@ func (s *primaryService) ListTopics(
 		infos = append(infos, service.InfoFromTopic(&topic, withPosts))
 	}
 	return infos, nil
-}
-
-func (s *primaryService) CreateTopic(
-	ctx context.Context,
-	user *model.User,
-	title string,
-	description *string,
-) (*service.TopicInfo, error) {
-	// Create new topic model
-	newTopic := model.Topic{
-		Name:        title,
-		Description: description,
-		AuthorID:    user.ID,
-	}
-
-	// Save new topic via repository
-	if err := s.repo.CreateTopic(ctx, &newTopic); err != nil {
-		return nil, errors.Join(service.ErrDatabaseError, err)
-	}
-
-	// Return the newly created topic's info
-	info := service.InfoFromTopic(&newTopic, false)
-	return &info, nil
-}
-
-func (s *primaryService) GetTopicInfoByID(
-	ctx context.Context,
-	topicID uint,
-) (*service.TopicInfo, error) {
-	// Fetch topic from repository
-	topic, err := s.repo.GetTopicByID(ctx, topicID)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, service.ErrTopicNotFound
-		} else {
-			return nil, errors.Join(service.ErrDatabaseError, err)
-		}
-	}
-
-	// Convert to DTO
-	info := service.InfoFromTopic(&topic, true)
-	return &info, nil
 }
 
 func (s *primaryService) UpdateTopic(

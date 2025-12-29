@@ -21,7 +21,7 @@ func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Delegate to service layer to get user profile
-		userProfile, err := svc.GetUserProfileByID(c.Request.Context(), userId)
+		userProfile, err := svc.FetchUserByID(c.Request.Context(), userId)
 		if err != nil {
 			handleServiceError(c, err)
 			return
@@ -52,7 +52,7 @@ func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Delegate to service layer to get user profile
-		userProfile, err := svc.GetCurrentUserProfile(c.Request.Context(), userObj)
+		userProfile, err := svc.FetchCurrentUser(c.Request.Context(), userObj)
 		if err != nil {
 			handleServiceError(c, err)
 			return
@@ -109,7 +109,7 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Delegate to service layer to update user profile
-		err := svc.UpdateCurrentUserProfile(c.Request.Context(), userObj, updateReq.AvatarUrl, updateReq.Bio)
+		err := svc.UpdateCurrentUser(c.Request.Context(), userObj, updateReq.AvatarUrl, updateReq.Bio)
 		if err != nil {
 			handleServiceError(c, err)
 			return

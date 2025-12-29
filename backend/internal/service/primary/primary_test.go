@@ -61,7 +61,7 @@ func TestGetUserProfileByID(t *testing.T) {
 		mockRepo.CreateUser(ctx, testUser)
 
 		// Execute
-		profile, err := svc.GetUserProfileByID(ctx, 1)
+		profile, err := svc.FetchUserByID(ctx, 1)
 
 		// Assert
 		if err != nil {
@@ -94,7 +94,7 @@ func TestGetUserProfileByID(t *testing.T) {
 		ctx := context.Background()
 
 		// Execute
-		profile, err := svc.GetUserProfileByID(ctx, 999)
+		profile, err := svc.FetchUserByID(ctx, 999)
 
 		// Assert
 		if err == nil {
@@ -123,7 +123,7 @@ func TestGetCurrentUserProfile(t *testing.T) {
 		testUser := createTestUser(1, "currentuser", "current@example.com")
 
 		// Execute
-		profile, err := svc.GetCurrentUserProfile(ctx, testUser)
+		profile, err := svc.FetchCurrentUser(ctx, testUser)
 
 		// Assert
 		if err != nil {
@@ -168,7 +168,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		newBio := "Updated bio"
 
 		// Execute
-		err = svc.UpdateCurrentUserProfile(ctx, testUser, &newAvatarURL, &newBio)
+		err = svc.UpdateCurrentUser(ctx, testUser, &newAvatarURL, &newBio)
 
 		// Assert
 		if err != nil {
@@ -197,7 +197,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		newAvatarURL := "https://example.com/new-avatar.jpg"
 
 		// Execute
-		err = svc.UpdateCurrentUserProfile(ctx, testUser, &newAvatarURL, nil)
+		err = svc.UpdateCurrentUser(ctx, testUser, &newAvatarURL, nil)
 
 		// Assert
 		if err != nil {
@@ -227,7 +227,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		newBio := "Updated bio only"
 
 		// Execute
-		err = svc.UpdateCurrentUserProfile(ctx, testUser, nil, &newBio)
+		err = svc.UpdateCurrentUser(ctx, testUser, nil, &newBio)
 
 		// Assert
 		if err != nil {
@@ -256,7 +256,7 @@ func TestUpdateCurrentUserProfile(t *testing.T) {
 		mockRepo.CreateUser(ctx, testUser)
 
 		// Execute
-		err = svc.UpdateCurrentUserProfile(ctx, testUser, nil, nil)
+		err = svc.UpdateCurrentUser(ctx, testUser, nil, nil)
 
 		// Assert
 		if err != nil {
