@@ -13,7 +13,7 @@ func (r *sqlRepository) CreatePost(ctx context.Context, post *model.Post) error 
 		Create(ctx, post)
 }
 
-func (r *sqlRepository) GetPostByID(ctx context.Context, id uint) (model.Post, error) {
+func (r *sqlRepository) GetOnePost(ctx context.Context, id uint) (model.Post, error) {
 	return gorm.
 		G[model.Post](&r.db).
 		Preload("Author", nil).
@@ -68,10 +68,10 @@ func (r *sqlRepository) UpdatePost(ctx context.Context, post *model.Post) error 
 	return err
 }
 
-func (r *sqlRepository) DeletePost(ctx context.Context, post *model.Post) error {
+func (r *sqlRepository) DeletePost(ctx context.Context, postID uint) error {
 	_, err := gorm.
 		G[model.Post](&r.db).
-		Where("id = ?", post.ID).
+		Where("id = ?", postID).
 		Delete(ctx)
 	return err
 }

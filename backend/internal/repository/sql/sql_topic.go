@@ -48,7 +48,7 @@ func (r *sqlRepository) CreateTopic(
 		Create(ctx, topic)
 }
 
-func (r *sqlRepository) GetTopicByID(
+func (r *sqlRepository) GetOneTopic(
 	ctx context.Context,
 	id uint,
 ) (model.Topic, error) {
@@ -72,11 +72,11 @@ func (r *sqlRepository) UpdateTopic(
 
 func (r *sqlRepository) DeleteTopic(
 	ctx context.Context,
-	topic *model.Topic,
+	topicID uint,
 ) error {
 	_, err := gorm.
 		G[model.Topic](&r.db).
-		Where("id = ?", topic.ID).
+		Where("id = ?", topicID).
 		Delete(ctx)
 	return err
 }

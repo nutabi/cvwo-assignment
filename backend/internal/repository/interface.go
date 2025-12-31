@@ -21,16 +21,16 @@ type Repository interface {
 	// Topic-related repository methods
 
 	CreateTopic(ctx context.Context, topic *model.Topic) error
-	GetTopicByID(ctx context.Context, id uint) (model.Topic, error)
+	GetOneTopic(ctx context.Context, id uint) (model.Topic, error)
 	GetTopics(ctx context.Context, limit, offset int, userID *uint, withPosts bool) ([]model.Topic, error)
 	UpdateTopic(ctx context.Context, topic *model.Topic) error
-	DeleteTopic(ctx context.Context, topic *model.Topic) error
+	DeleteTopic(ctx context.Context, topicID uint) error
 
 	// Post-related repository methods
 
 	CreatePost(ctx context.Context, post *model.Post) error
-	GetPostByID(ctx context.Context, id uint) (model.Post, error)
+	GetOnePost(ctx context.Context, id uint) (model.Post, error)
 	GetPosts(ctx context.Context, limit, offset int, topicID *uint, userID *uint, withComments bool) ([]model.Post, error)
 	UpdatePost(ctx context.Context, post *model.Post) error
-	DeletePost(ctx context.Context, post *model.Post) error
+	DeletePost(ctx context.Context, postID uint) error
 }

@@ -73,7 +73,7 @@ func (s *primaryService) FetchPostByID(
 	postID uint,
 ) (*service.PostInfo, error) {
 	// Fetch post from repository
-	post, err := s.repo.GetPostByID(ctx, postID)
+	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (s *primaryService) UpdatePost(
 	content *string,
 ) error {
 	// Fetch existing post
-	post, err := s.repo.GetPostByID(ctx, postID)
+	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func (s *primaryService) DeletePost(
 	userID uint,
 ) error {
 	// Fetch existing post
-	post, err := s.repo.GetPostByID(ctx, postID)
+	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
 		return err
 	}
@@ -134,7 +134,7 @@ func (s *primaryService) DeletePost(
 	}
 
 	// Delete post via repository
-	if err := s.repo.DeletePost(ctx, &post); err != nil {
+	if err := s.repo.DeletePost(ctx, postID); err != nil {
 		return err
 	}
 

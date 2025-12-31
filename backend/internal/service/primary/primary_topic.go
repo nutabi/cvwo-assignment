@@ -37,7 +37,7 @@ func (s *primaryService) FetchTopicByID(
 	topicID uint,
 ) (*service.TopicInfo, error) {
 	// Fetch topic from repository
-	topic, err := s.repo.GetTopicByID(ctx, topicID)
+	topic, err := s.repo.GetOneTopic(ctx, topicID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, service.ErrTopicNotFound
@@ -86,7 +86,7 @@ func (s *primaryService) UpdateTopic(
 	description *string,
 ) error {
 	// Fetch topic from repository
-	topic, err := s.repo.GetTopicByID(ctx, topicID)
+	topic, err := s.repo.GetOneTopic(ctx, topicID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return service.ErrTopicNotFound
@@ -127,7 +127,7 @@ func (s *primaryService) DeleteTopic(
 	userID uint,
 ) error {
 	// Fetch topic from repository
-	topic, err := s.repo.GetTopicByID(ctx, topicID)
+	topic, err := s.repo.GetOneTopic(ctx, topicID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return service.ErrTopicNotFound
@@ -142,7 +142,7 @@ func (s *primaryService) DeleteTopic(
 	}
 
 	// Delete topic via repository
-	if err := s.repo.DeleteTopic(ctx, &topic); err != nil {
+	if err := s.repo.DeleteTopic(ctx, topicID); err != nil {
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 

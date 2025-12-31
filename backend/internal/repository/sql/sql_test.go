@@ -419,7 +419,7 @@ func TestGetTopicByID(t *testing.T) {
 	}
 	for i, mt := range mockTopics {
 		t.Run(mt.name, func(t *testing.T) {
-			topic, err := repo.GetTopicByID(context.Background(), uint(i+1))
+			topic, err := repo.GetOneTopic(context.Background(), uint(i+1))
 			if err != nil {
 				t.Errorf("Failed to get topic by ID: %v", err)
 			}
@@ -443,7 +443,7 @@ func TestGetTopicByID_NotFound(t *testing.T) {
 	}
 
 	// Try to get non-existent topic
-	_, err = repo.GetTopicByID(context.Background(), 9999)
+	_, err = repo.GetOneTopic(context.Background(), 9999)
 	if err == nil {
 		t.Error("Expected error when getting non-existent topic, got nil")
 	}
@@ -534,7 +534,7 @@ func TestUpdateTopic(t *testing.T) {
 		t.Fatalf("Failed to initialize repository: %v", err)
 	}
 
-	topic, err := repo.GetTopicByID(context.Background(), 1)
+	topic, err := repo.GetOneTopic(context.Background(), 1)
 	if err != nil {
 		t.Fatalf("Failed to get topic: %v", err)
 	}
@@ -547,7 +547,7 @@ func TestUpdateTopic(t *testing.T) {
 	}
 
 	// Retrieve again to check update
-	updatedTopic, err := repo.GetTopicByID(context.Background(), 1)
+	updatedTopic, err := repo.GetOneTopic(context.Background(), 1)
 	if err != nil {
 		t.Fatalf("Failed to get topic after update: %v", err)
 	}
@@ -563,7 +563,7 @@ func TestUpdateTopic(t *testing.T) {
 	}
 
 	// Retrieve again to check update
-	finalTopic, err := repo.GetTopicByID(context.Background(), 1)
+	finalTopic, err := repo.GetOneTopic(context.Background(), 1)
 	if err != nil {
 		t.Fatalf("Failed to get topic after description update: %v", err)
 	}
@@ -579,18 +579,18 @@ func TestDeleteTopic(t *testing.T) {
 	}
 
 	// Get topic with ID 1
-	topic, err := repo.GetTopicByID(context.Background(), 1)
+	topic, err := repo.GetOneTopic(context.Background(), 1)
 	if err != nil {
 		t.Fatalf("Failed to get topic: %v", err)
 	}
 
 	// Delete topic
-	if err := repo.DeleteTopic(context.Background(), &topic); err != nil {
+	if err := repo.DeleteTopic(context.Background(), topic.ID); err != nil {
 		t.Fatalf("Failed to delete topic: %v", err)
 	}
 
 	// Verify topic is deleted
-	_, err = repo.GetTopicByID(context.Background(), 1)
+	_, err = repo.GetOneTopic(context.Background(), 1)
 	if err == nil {
 		t.Error("Expected error when getting deleted topic, got nil")
 	}
@@ -606,9 +606,7 @@ func TestDeleteTopic_NotFound(t *testing.T) {
 	}
 
 	// Try to delete non-existent topic
-	nonExistentTopic := &model.Topic{}
-	nonExistentTopic.ID = 9999
-	err = repo.DeleteTopic(context.Background(), nonExistentTopic)
+	err = repo.DeleteTopic(context.Background(), 9999)
 	// Since the implementation doesn't check if topic exists before deleting,
 	// this won't return an error. The delete will just affect 0 rows.
 	// This test now verifies that deleting a non-existent topic doesn't cause a panic
