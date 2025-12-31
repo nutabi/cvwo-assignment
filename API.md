@@ -84,27 +84,35 @@
 
 ## Topics
 
-### List Topics
-
-- Endpoint: `GET {ROOT}/topics`
-
 ### Create Topic
 
 - Endpoint: `POST {ROOT}/topics`
+
+### List Topics
+
+- Endpoint: `GET {ROOT}/topics`
 
 ### Get Topic Details
 
 - Endpoint: `GET {ROOT}/topics/{topic_id}`
 
+### Update Topic
+
+- Endpoint: `PATCH {ROOT}/topics/{topic_id}`
+
+### Delete Topic
+
+- Endpoint: `DELETE {ROOT}/topics/{topic_id}`
+
 ## Posts
 
-### List Posts Inside a Topic
-
-- Endpoint: `GET {ROOT}/topics/{topic_id}/posts`
-
-### Create Post Inside a Topic
+### Create Post
 
 - Endpoint: `POST {ROOT}/topics/{topic_id}/posts`
+
+### List Posts
+
+- Endpoint: `GET {ROOT}/posts`
 
 ### Get Post Details
 
@@ -120,13 +128,13 @@
 
 ## Comments
 
-### List Comments on a Post
-
-- Endpoint: `GET {ROOT}/posts/{post_id}/comments`
-
-### Create Comment on a Post
+### Create Comment
 
 - Endpoint: `POST {ROOT}/posts/{post_id}/comments`
+
+### List Comments
+
+- Endpoint: `GET {ROOT}/comments`
 
 ### Get Comment Details
 
