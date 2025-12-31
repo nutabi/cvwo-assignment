@@ -59,9 +59,8 @@ func (s *primaryService) FetchUserByID(ctx context.Context, id uint) (*service.U
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, service.ErrUserNotFound
-		} else {
-			return nil, errors.Join(service.ErrDatabaseError, err)
 		}
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Map repository user to service user profile

@@ -41,9 +41,8 @@ func (s *primaryService) FetchTopicByID(
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, service.ErrTopicNotFound
-		} else {
-			return nil, errors.Join(service.ErrDatabaseError, err)
 		}
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Convert to DTO
@@ -89,9 +88,8 @@ func (s *primaryService) UpdateTopic(
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return service.ErrTopicNotFound
-		} else {
-			return errors.Join(service.ErrDatabaseError, err)
 		}
+		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Check if the user is the author
@@ -135,9 +133,8 @@ func (s *primaryService) DeleteTopic(
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return service.ErrTopicNotFound
-		} else {
-			return errors.Join(service.ErrDatabaseError, err)
 		}
+		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Check if the user is the author
