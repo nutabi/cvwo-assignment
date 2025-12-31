@@ -27,8 +27,14 @@ func (s *primaryService) CreateTopic(
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
+	// Fetch the created topic with Author preloaded
+	topic, err := s.repo.GetOneTopic(ctx, newTopic.ID)
+	if err != nil {
+		return nil, errors.Join(service.ErrDatabaseError, err)
+	}
+
 	// Return the newly created topic's info
-	info := service.InfoFromTopic(&newTopic)
+	info := service.InfoFromTopic(topic)
 	return info, nil
 }
 

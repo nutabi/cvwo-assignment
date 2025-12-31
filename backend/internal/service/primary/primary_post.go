@@ -29,8 +29,14 @@ func (s *primaryService) CreatePost(
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
+	// Fetch the created post with Author preloaded
+	post, err := s.repo.GetOnePost(ctx, newPost.ID)
+	if err != nil {
+		return nil, errors.Join(service.ErrDatabaseError, err)
+	}
+
 	// Return the newly created post's info
-	info := service.InfoFromPost(&newPost)
+	info := service.InfoFromPost(post)
 	return info, nil
 }
 
