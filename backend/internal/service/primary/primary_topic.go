@@ -56,7 +56,6 @@ func (s *primaryService) FetchTopics(
 	limit,
 	offset int,
 	userID uint,
-	withPosts bool,
 ) ([]service.TopicInfo, error) {
 	// Initialize userID pointer
 	var userIDPtr *uint
@@ -65,7 +64,7 @@ func (s *primaryService) FetchTopics(
 	}
 
 	// Fetch topics from repository
-	topics, err := s.repo.GetTopics(ctx, limit, offset, userIDPtr, withPosts)
+	topics, err := s.repo.GetTopics(ctx, limit, offset, userIDPtr)
 	if err != nil {
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}

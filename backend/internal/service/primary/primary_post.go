@@ -38,7 +38,6 @@ func (s *primaryService) FetchPosts(
 	offset int,
 	topicID,
 	userID uint,
-	withComments bool,
 ) ([]service.PostInfo, error) {
 	// Initialise userID pointer
 	var userIDPtr *uint
@@ -53,7 +52,7 @@ func (s *primaryService) FetchPosts(
 	}
 
 	// Fetch posts from repository
-	posts, err := s.repo.GetPosts(ctx, limit, offset, topicIDPtr, userIDPtr, withComments)
+	posts, err := s.repo.GetPosts(ctx, limit, offset, topicIDPtr, userIDPtr)
 	if err != nil {
 		return nil, err
 	}

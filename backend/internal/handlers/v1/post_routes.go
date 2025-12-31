@@ -52,9 +52,6 @@ func handleListPosts(svc service.Service) gin.HandlerFunc {
 		topicID := tryGetIDQuery(c, "topic_id")
 		userID := tryGetIDQuery(c, "user_id")
 
-		// Parse preload comments
-		withComments := tryGetBoolQuery(c, "with_comments", false)
-
 		// Delegate to service layer to get list of posts
 		posts, err := svc.FetchPosts(
 			c.Request.Context(),
@@ -62,7 +59,6 @@ func handleListPosts(svc service.Service) gin.HandlerFunc {
 			offset,
 			topicID,
 			userID,
-			withComments,
 		)
 		if err != nil {
 			handleServiceError(c, err)

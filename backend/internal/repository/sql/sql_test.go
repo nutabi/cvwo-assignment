@@ -474,7 +474,7 @@ func TestGetTopics(t *testing.T) {
 	}
 
 	t.Run("GetAllTopics", func(t *testing.T) {
-		topics, err := repo.GetTopics(context.Background(), 10, 0, nil, false)
+		topics, err := repo.GetTopics(context.Background(), 10, 0, nil)
 		if err != nil {
 			t.Fatalf("Failed to get all topics: %v", err)
 		}
@@ -484,7 +484,7 @@ func TestGetTopics(t *testing.T) {
 	})
 
 	t.Run("GetTopicsWithLimit", func(t *testing.T) {
-		topics, err := repo.GetTopics(context.Background(), 2, 0, nil, false)
+		topics, err := repo.GetTopics(context.Background(), 2, 0, nil)
 		if err != nil {
 			t.Fatalf("Failed to get topics with limit: %v", err)
 		}
@@ -494,7 +494,7 @@ func TestGetTopics(t *testing.T) {
 	})
 
 	t.Run("GetTopicsWithOffset", func(t *testing.T) {
-		topics, err := repo.GetTopics(context.Background(), 10, 1, nil, false)
+		topics, err := repo.GetTopics(context.Background(), 10, 1, nil)
 		if err != nil {
 			t.Fatalf("Failed to get topics with offset: %v", err)
 		}
@@ -505,7 +505,7 @@ func TestGetTopics(t *testing.T) {
 
 	t.Run("GetTopicsByUserID", func(t *testing.T) {
 		userID := uint(1)
-		topics, err := repo.GetTopics(context.Background(), 10, 0, &userID, false)
+		topics, err := repo.GetTopics(context.Background(), 10, 0, &userID)
 		if err != nil {
 			t.Fatalf("Failed to get topics by user ID: %v", err)
 		}
@@ -527,7 +527,7 @@ func TestGetTopics(t *testing.T) {
 	})
 
 	t.Run("GetTopicsWithPosts", func(t *testing.T) {
-		topics, err := repo.GetTopics(context.Background(), 10, 0, nil, true)
+		topics, err := repo.GetTopics(context.Background(), 10, 0, nil)
 		if err != nil {
 			t.Fatalf("Failed to get topics with posts: %v", err)
 		}

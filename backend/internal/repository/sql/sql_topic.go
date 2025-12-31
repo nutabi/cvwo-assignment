@@ -11,7 +11,6 @@ func (r *sqlRepository) GetTopics(
 	ctx context.Context,
 	limit, offset int,
 	userID *uint,
-	withPosts bool,
 ) ([]model.Topic, error) {
 	// Base query
 	query := gorm.
@@ -23,11 +22,6 @@ func (r *sqlRepository) GetTopics(
 	// Filter by userID if provided
 	if userID != nil {
 		query = query.Where("author_id = ?", *userID)
-	}
-
-	// Preload posts if requested
-	if withPosts {
-		query = query.Preload("Posts", nil)
 	}
 
 	// Execute query
@@ -55,6 +49,7 @@ func (r *sqlRepository) GetOneTopic(
 	topic, err := gorm.
 		G[model.Topic](r.db).
 		Preload("Author", nil).
+		Preload("Posts", nil).
 		Where("id = ?", id).
 		First(ctx)
 	return &topic, err

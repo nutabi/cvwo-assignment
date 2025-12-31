@@ -28,7 +28,6 @@ func (r *sqlRepository) GetPosts(
 	limit, offset int,
 	topicID *uint,
 	userID *uint,
-	withComments bool,
 ) ([]model.Post, error) {
 	// Base query
 	query := gorm.
@@ -45,11 +44,6 @@ func (r *sqlRepository) GetPosts(
 	// Filter by userID if provided
 	if userID != nil {
 		query = query.Where("author_id = ?", *userID)
-	}
-
-	// Preload comments if requested
-	if withComments {
-		query = query.Preload("Comments", nil)
 	}
 
 	// Execute query

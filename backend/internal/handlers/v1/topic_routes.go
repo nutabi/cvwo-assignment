@@ -16,16 +16,12 @@ func handleListTopics(svc service.Service) gin.HandlerFunc {
 		// Parse filter parameters
 		userID := tryGetIDQuery(c, "user_id")
 
-		// Parse preload posts
-		withPosts := tryGetBoolQuery(c, "with_posts", false)
-
 		// Delegate to service layer to get list of topics
 		topics, err := svc.FetchTopics(
 			c.Request.Context(),
 			limit,
 			offset,
 			userID,
-			withPosts,
 		)
 		if err != nil {
 			handleServiceError(c, err)
