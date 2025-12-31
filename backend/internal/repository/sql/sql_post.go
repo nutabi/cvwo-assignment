@@ -13,13 +13,14 @@ func (r *sqlRepository) CreatePost(ctx context.Context, post *model.Post) error 
 		Create(ctx, post)
 }
 
-func (r *sqlRepository) GetOnePost(ctx context.Context, id uint) (model.Post, error) {
-	return gorm.
+func (r *sqlRepository) GetOnePost(ctx context.Context, id uint) (*model.Post, error) {
+	post, err := gorm.
 		G[model.Post](r.db).
 		Preload("Author", nil).
 		Preload("Comments", nil).
 		Where("id = ?", id).
 		First(ctx)
+	return &post, err
 }
 
 func (r *sqlRepository) GetPosts(

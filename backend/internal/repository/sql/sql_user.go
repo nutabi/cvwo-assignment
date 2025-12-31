@@ -10,23 +10,23 @@ import (
 func (r *sqlRepository) GetUserByID(
 	ctx context.Context,
 	id uint,
-) (model.User, error) {
+) (*model.User, error) {
 	user, err := gorm.
 		G[model.User](r.db).
 		Where("id = ?", id).
 		First(ctx)
-	return user, err
+	return &user, err
 }
 
 func (r *sqlRepository) GetUserByUsername(
 	ctx context.Context,
 	username string,
-) (model.User, error) {
+) (*model.User, error) {
 	user, err := gorm.
 		G[model.User](r.db).
 		Where("username = ?", username).
 		First(ctx)
-	return user, err
+	return &user, err
 }
 
 func (r *sqlRepository) UpdateUser(
@@ -76,11 +76,7 @@ func (r *sqlRepository) CreateUser(
 	ctx context.Context,
 	user *model.User,
 ) error {
-	err := gorm.
+	return gorm.
 		G[model.User](r.db).
 		Create(ctx, user)
-	if err != nil {
-		return err
-	}
-	return nil
 }

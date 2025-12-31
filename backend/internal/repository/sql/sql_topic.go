@@ -51,12 +51,13 @@ func (r *sqlRepository) CreateTopic(
 func (r *sqlRepository) GetOneTopic(
 	ctx context.Context,
 	id uint,
-) (model.Topic, error) {
-	return gorm.
+) (*model.Topic, error) {
+	topic, err := gorm.
 		G[model.Topic](r.db).
 		Preload("Author", nil).
 		Where("id = ?", id).
 		First(ctx)
+	return &topic, err
 }
 
 func (r *sqlRepository) UpdateTopic(

@@ -65,7 +65,7 @@ func (s *primaryService) FetchUserByID(ctx context.Context, id uint) (*service.U
 	}
 
 	// Map repository user to service user profile
-	profile := service.ProfileFromUser(&user, false)
+	profile := service.ProfileFromUser(user, false)
 	return &profile, nil
 }
 

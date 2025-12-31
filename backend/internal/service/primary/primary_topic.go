@@ -47,7 +47,7 @@ func (s *primaryService) FetchTopicByID(
 	}
 
 	// Convert to DTO
-	info := service.InfoFromTopic(&topic, true)
+	info := service.InfoFromTopic(topic, true)
 	return &info, nil
 }
 

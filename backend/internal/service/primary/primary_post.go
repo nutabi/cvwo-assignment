@@ -79,7 +79,7 @@ func (s *primaryService) FetchPostByID(
 	}
 
 	// Convert to DTO
-	info := service.InfoFromPost(&post, true)
+	info := service.InfoFromPost(post, true)
 	return &info, nil
 }
 
