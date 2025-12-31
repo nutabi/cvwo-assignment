@@ -81,17 +81,17 @@ func (s *primaryService) UpdateCurrentUser(
 	newAvatarUrl,
 	newBio *string,
 ) error {
+	// Make sure at least one field is being updated
+	if newAvatarUrl == nil && newBio == nil {
+		return service.ErrNoUpdateFields
+	}
+
 	// Update fields if provided
 	if newAvatarUrl != nil {
 		user.AvatarURL = newAvatarUrl
 	}
 	if newBio != nil {
 		user.Bio = newBio
-	}
-
-	// Make sure at least one field is being updated
-	if newAvatarUrl == nil && newBio == nil {
-		return service.ErrNoUpdateFields
 	}
 
 	// Save changes via repository

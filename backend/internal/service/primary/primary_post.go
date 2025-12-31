@@ -2,9 +2,11 @@ package primary
 
 import (
 	"context"
+	"errors"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
+	"gorm.io/gorm"
 )
 
 func (s *primaryService) CreatePost(
@@ -24,7 +26,7 @@ func (s *primaryService) CreatePost(
 
 	// Save new post via repository
 	if err := s.repo.CreatePost(ctx, &newPost); err != nil {
-		return nil, err
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Return the newly created post's info
@@ -54,7 +56,7 @@ func (s *primaryService) FetchPosts(
 	// Fetch posts from repository
 	posts, err := s.repo.GetPosts(ctx, limit, offset, topicIDPtr, userIDPtr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Convert to DTOs
@@ -74,7 +76,11 @@ func (s *primaryService) FetchPostByID(
 	// Fetch post from repository
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
-		return nil, err
+		if err == gorm.ErrRecordNotFound {
+			return nil, service.ErrPostNotFound
+		} else {
+			return nil, errors.Join(service.ErrDatabaseError, err)
+		}
 	}
 
 	// Convert to DTO
@@ -92,12 +98,21 @@ func (s *primaryService) UpdatePost(
 	// Fetch existing post
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
-		return err
+		if err == gorm.ErrRecordNotFound {
+			return service.ErrPostNotFound
+		} else {
+			return errors.Join(service.ErrDatabaseError, err)
+		}
 	}
 
 	// Check if the user is the author
 	if post.AuthorID != userID {
 		return service.ErrForbidden
+	}
+
+	// Make sure at least one field is being updated
+	if title == nil && content == nil {
+		return service.ErrNoUpdateFields
 	}
 
 	// Update fields if provided
@@ -129,7 +144,11 @@ func (s *primaryService) DeletePost(
 	// Fetch existing post
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
-		return err
+		if err == gorm.ErrRecordNotFound {
+			return service.ErrPostNotFound
+		} else {
+			return errors.Join(service.ErrDatabaseError, err)
+		}
 	}
 
 	// Check if the user is the author

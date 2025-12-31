@@ -20,6 +20,9 @@ var (
 	// Topic not found error
 	ErrTopicNotFound = errors.New("topic not found")
 
+	// Post not found error
+	ErrPostNotFound = errors.New("post not found")
+
 	// Forbidden access error
 	ErrForbidden = errors.New("forbidden")
 
