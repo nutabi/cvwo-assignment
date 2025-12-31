@@ -56,8 +56,7 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 			Title       string  `json:"title" form:"title" binding:"required"`
 			Description *string `json:"description" form:"description"`
 		}
-		if err := c.ShouldBind(&req); err != nil {
-			respondWithError(c, http.StatusUnprocessableEntity, "invalid request body")
+		if !parseRequestBody(c, &req) {
 			return
 		}
 
@@ -124,8 +123,7 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 			Title       *string `json:"title" form:"title"`
 			Description *string `json:"description" form:"description"`
 		}
-		if err := c.ShouldBind(&req); err != nil {
-			respondWithError(c, http.StatusUnprocessableEntity, "invalid request body")
+		if !parseRequestBody(c, &req) {
 			return
 		}
 

@@ -93,3 +93,11 @@ func retrieveUser(c *gin.Context) *model.User {
 	}
 	return userObj
 }
+
+func parseRequestBody(c *gin.Context, obj any) bool {
+	if err := c.ShouldBind(obj); err != nil {
+		respondWithError(c, http.StatusBadRequest, "invalid request body")
+		return false
+	}
+	return true
+}

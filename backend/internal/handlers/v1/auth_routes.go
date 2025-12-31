@@ -16,8 +16,7 @@ func handleUserRegistration(svc service.Service) gin.HandlerFunc {
 			Email    string `form:"email" json:"email"`
 			Password string `form:"password" json:"password"`
 		}
-		if err := c.ShouldBind(&reqBody); err != nil {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid request body")
+		if !parseRequestBody(c, &reqBody) {
 			return
 		}
 

@@ -65,8 +65,7 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 			AvatarUrl *string `form:"avatar_url" json:"avatar_url"`
 			Bio       *string `form:"bio" json:"bio"`
 		}
-		if err := c.ShouldBind(&updateReq); err != nil {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid request body")
+		if !parseRequestBody(c, &updateReq) {
 			return
 		}
 
