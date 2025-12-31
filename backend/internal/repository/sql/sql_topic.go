@@ -15,7 +15,7 @@ func (r *sqlRepository) GetTopics(
 ) ([]model.Topic, error) {
 	// Base query
 	query := gorm.
-		G[model.Topic](&r.db).
+		G[model.Topic](r.db).
 		Preload("Author", nil).
 		Offset(offset).
 		Limit(limit)
@@ -44,7 +44,7 @@ func (r *sqlRepository) CreateTopic(
 	topic *model.Topic,
 ) error {
 	return gorm.
-		G[model.Topic](&r.db).
+		G[model.Topic](r.db).
 		Create(ctx, topic)
 }
 
@@ -53,7 +53,7 @@ func (r *sqlRepository) GetOneTopic(
 	id uint,
 ) (model.Topic, error) {
 	return gorm.
-		G[model.Topic](&r.db).
+		G[model.Topic](r.db).
 		Preload("Author", nil).
 		Where("id = ?", id).
 		First(ctx)
@@ -64,7 +64,7 @@ func (r *sqlRepository) UpdateTopic(
 	topic *model.Topic,
 ) error {
 	_, err := gorm.
-		G[model.Topic](&r.db).
+		G[model.Topic](r.db).
 		Where("id = ?", topic.ID).
 		Updates(ctx, model.Topic{Name: topic.Name, Description: topic.Description})
 	return err
@@ -75,7 +75,7 @@ func (r *sqlRepository) DeleteTopic(
 	topicID uint,
 ) error {
 	_, err := gorm.
-		G[model.Topic](&r.db).
+		G[model.Topic](r.db).
 		Where("id = ?", topicID).
 		Delete(ctx)
 	return err

@@ -12,7 +12,7 @@ func (r *sqlRepository) GetUserByID(
 	id uint,
 ) (model.User, error) {
 	user, err := gorm.
-		G[model.User](&r.db).
+		G[model.User](r.db).
 		Where("id = ?", id).
 		First(ctx)
 	return user, err
@@ -23,7 +23,7 @@ func (r *sqlRepository) GetUserByUsername(
 	username string,
 ) (model.User, error) {
 	user, err := gorm.
-		G[model.User](&r.db).
+		G[model.User](r.db).
 		Where("username = ?", username).
 		First(ctx)
 	return user, err
@@ -34,7 +34,7 @@ func (r *sqlRepository) UpdateUser(
 	user *model.User,
 ) error {
 	_, err := gorm.
-		G[model.User](&r.db).
+		G[model.User](r.db).
 		Where("id = ?", user.ID).
 		Updates(ctx, model.User{AvatarURL: user.AvatarURL, Bio: user.Bio})
 	return err
@@ -45,7 +45,7 @@ func (r *sqlRepository) CheckUsernameExists(
 	username string,
 ) (bool, error) {
 	users, err := gorm.
-		G[model.User](&r.db).
+		G[model.User](r.db).
 		Where("username = ?", username).
 		Limit(1).
 		Find(ctx)
@@ -60,7 +60,7 @@ func (r *sqlRepository) CheckEmailExists(
 	email string,
 ) (bool, error) {
 	users, err := gorm.
-		G[model.User](&r.db).
+		G[model.User](r.db).
 		Where("email = ?", email).
 		Limit(1).
 		Find(ctx)
@@ -75,7 +75,7 @@ func (r *sqlRepository) CreateUser(
 	user *model.User,
 ) error {
 	err := gorm.
-		G[model.User](&r.db).
+		G[model.User](r.db).
 		Create(ctx, user)
 	if err != nil {
 		return err

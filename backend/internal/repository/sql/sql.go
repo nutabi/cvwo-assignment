@@ -9,7 +9,7 @@ import (
 )
 
 type sqlRepository struct {
-	db gorm.DB
+	db *gorm.DB
 }
 
 func Connect(dialect gorm.Dialector) (repository.Repository, error) {
@@ -18,7 +18,7 @@ func Connect(dialect gorm.Dialector) (repository.Repository, error) {
 		slog.Error("Unable to connect to SQL database", "error", err)
 		return nil, err
 	}
-	return &sqlRepository{db: *db}, nil
+	return &sqlRepository{db: db}, nil
 }
 
 func (r *sqlRepository) Migrate() error {
