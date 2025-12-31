@@ -56,8 +56,8 @@ func (s *primaryService) FetchTopics(
 	limit,
 	offset int,
 	userID uint,
-) ([]service.TopicInfo, error) {
-	// Initialize userID pointer
+) ([]*service.TopicInfo, error) {
+	// Initialise userID pointer
 	var userIDPtr *uint
 	if userID != 0 {
 		userIDPtr = &userID
@@ -70,9 +70,9 @@ func (s *primaryService) FetchTopics(
 	}
 
 	// Convert to DTO
-	infos := make([]service.TopicInfo, 0, len(topics))
+	infos := make([]*service.TopicInfo, 0, len(topics))
 	for _, topic := range topics {
-		infos = append(infos, *service.InfoFromTopic(&topic))
+		infos = append(infos, service.InfoFromTopic(&topic))
 	}
 	return infos, nil
 }

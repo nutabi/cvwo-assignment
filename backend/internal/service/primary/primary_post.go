@@ -40,7 +40,7 @@ func (s *primaryService) FetchPosts(
 	offset int,
 	topicID,
 	userID uint,
-) ([]service.PostInfo, error) {
+) ([]*service.PostInfo, error) {
 	// Initialise userID pointer
 	var userIDPtr *uint
 	if userID != 0 {
@@ -60,10 +60,10 @@ func (s *primaryService) FetchPosts(
 	}
 
 	// Convert to DTOs
-	postInfos := make([]service.PostInfo, 0, len(posts))
+	postInfos := make([]*service.PostInfo, 0, len(posts))
 	for _, post := range posts {
 		info := service.InfoFromPost(&post)
-		postInfos = append(postInfos, *info)
+		postInfos = append(postInfos, info)
 	}
 
 	return postInfos, nil
