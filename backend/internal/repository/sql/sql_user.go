@@ -18,7 +18,7 @@ func (r *sqlRepository) GetUserByID(
 	if err != nil {
 		return nil, err
 	}
-	return &user, err
+	return &user, nil
 }
 
 func (r *sqlRepository) GetUserByUsername(

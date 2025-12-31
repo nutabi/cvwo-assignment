@@ -23,7 +23,7 @@ func (r *sqlRepository) GetOnePost(ctx context.Context, id uint) (*model.Post, e
 	if err != nil {
 		return nil, err
 	}
-	return &post, err
+	return &post, nil
 }
 
 func (r *sqlRepository) GetPosts(
