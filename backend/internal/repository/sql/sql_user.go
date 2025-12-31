@@ -15,6 +15,9 @@ func (r *sqlRepository) GetUserByID(
 		G[model.User](r.db).
 		Where("id = ?", id).
 		First(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return &user, err
 }
 

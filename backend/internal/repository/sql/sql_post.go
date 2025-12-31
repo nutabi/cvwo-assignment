@@ -20,6 +20,9 @@ func (r *sqlRepository) GetOnePost(ctx context.Context, id uint) (*model.Post, e
 		Preload("Comments", nil).
 		Where("id = ?", id).
 		First(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return &post, err
 }
 

@@ -52,6 +52,9 @@ func (r *sqlRepository) GetOneTopic(
 		Preload("Posts", nil).
 		Where("id = ?", id).
 		First(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return &topic, err
 }
 
