@@ -94,7 +94,7 @@ func InfoFromPost(post *model.Post, withComments bool) PostInfo {
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
 		Title:     post.Title,
-		Content:   post.Content,
+		Content:   *post.Content,
 		Author:    ProfileFromUser(post.Author, false),
 		TopicID:   post.TopicID,
 	}

@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type Post struct {
 	gorm.Model
-	Title   string `gorm:"not null"`
-	Content string `gorm:"type:text;not null"`
+	Title   string  `gorm:"not null"`
+	Content *string `gorm:"type:text"`
 
 	AuthorID uint `gorm:"not null"`
 	TopicID  uint `gorm:"not null"`

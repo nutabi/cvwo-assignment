@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type Topic struct {
 	gorm.Model
-	Name        string `gorm:"uniqueIndex;not null"`
-	Description *string
+	Name        string  `gorm:"uniqueIndex;not null"`
+	Description *string `gorm:"type:text"`
 
 	AuthorID uint `gorm:"not null"`
 
