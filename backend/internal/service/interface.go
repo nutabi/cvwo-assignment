@@ -25,4 +25,12 @@ type Service interface {
 	FetchTopicByID(ctx context.Context, topicID uint) (*TopicInfo, error)
 	UpdateTopic(ctx context.Context, topicID, userID uint, title, description *string) error
 	DeleteTopic(ctx context.Context, topicID, userID uint) error
+
+	// Post-related services
+
+	CreatePost(ctx context.Context, userID uint, topicID uint, title, content string) (*PostInfo, error)
+	FetchPosts(ctx context.Context, limit, offset int, postID, userID uint, withComments bool) ([]PostInfo, error)
+	FetchPostByID(ctx context.Context, postID uint) (*PostInfo, error)
+	UpdatePost(ctx context.Context, postID, userID uint, title, content *string) error
+	DeletePost(ctx context.Context, postID, userID uint) error
 }
