@@ -52,9 +52,9 @@ func Initialise(cfg config.Config) App {
 		cfg.GetJWTSecretKey(),
 	)
 
-	// Initialize the JWT middleware
+	// Initialise the JWT middleware
 	if err := auth.MiddlewareInit(); err != nil {
-		slog.Error("Failed to initialize JWT middleware", "error", err)
+		slog.Error("Failed to initialise JWT middleware", "error", err)
 		panic(err)
 	}
 

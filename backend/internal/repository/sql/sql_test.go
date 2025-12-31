@@ -151,7 +151,7 @@ func TestMigrate(t *testing.T) {
 func TestGetUserByID(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for i, mu := range mockUsers {
 		t.Run(mu.username, func(t *testing.T) {
@@ -169,7 +169,7 @@ func TestGetUserByID(t *testing.T) {
 func TestGetUserByUsername(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for _, mu := range mockUsers {
 		t.Run(mu.username, func(t *testing.T) {
@@ -187,7 +187,7 @@ func TestGetUserByUsername(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for _, mu := range mockUsers {
 		t.Run(mu.username, func(t *testing.T) {
@@ -244,7 +244,7 @@ func TestUpdateUser(t *testing.T) {
 func TestCheckUsernameExists(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for _, mu := range mockUsers {
 		t.Run(mu.username, func(t *testing.T) {
@@ -271,7 +271,7 @@ func TestCheckUsernameExists(t *testing.T) {
 func TestCheckEmailExists(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for _, mu := range mockUsers {
 		t.Run(mu.email, func(t *testing.T) {
@@ -298,7 +298,7 @@ func TestCheckEmailExists(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	repo, err := initRepo()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for _, mu := range mockUsers {
 		t.Run(mu.username, func(t *testing.T) {
@@ -325,7 +325,7 @@ func TestConnectSQL_InvalidDialect(t *testing.T) {
 func TestGetUserByID_NotFound(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to get non-existent user
@@ -341,7 +341,7 @@ func TestGetUserByID_NotFound(t *testing.T) {
 func TestGetUserByUsername_NotFound(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to get non-existent user
@@ -357,7 +357,7 @@ func TestGetUserByUsername_NotFound(t *testing.T) {
 func TestCreateUser_DuplicateUsername(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to create a user with an existing username
@@ -374,7 +374,7 @@ func TestCreateUser_DuplicateUsername(t *testing.T) {
 func TestCreateUser_DuplicateEmail(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to create a user with an existing email
@@ -391,7 +391,7 @@ func TestCreateUser_DuplicateEmail(t *testing.T) {
 func TestUpdateUser_WithAvatarAndBio(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	user, err := repo.GetUserByID(context.Background(), 1)
@@ -434,7 +434,7 @@ func TestUpdateUser_WithAvatarAndBio(t *testing.T) {
 func TestCreateTopic(t *testing.T) {
 	repo, err := initRepoWithMockUsers()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for _, mt := range mockTopics {
 		t.Run(mt.name, func(t *testing.T) {
@@ -453,7 +453,7 @@ func TestCreateTopic(t *testing.T) {
 func TestCreateTopic_DuplicateName(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to create a topic with an existing name
@@ -471,7 +471,7 @@ func TestCreateTopic_DuplicateName(t *testing.T) {
 func TestGetTopicByID(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for i, mt := range mockTopics {
 		t.Run(mt.name, func(t *testing.T) {
@@ -495,7 +495,7 @@ func TestGetTopicByID(t *testing.T) {
 func TestGetTopicByID_NotFound(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to get non-existent topic
@@ -511,7 +511,7 @@ func TestGetTopicByID_NotFound(t *testing.T) {
 func TestGetTopics(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	t.Run("GetAllTopics", func(t *testing.T) {
@@ -587,7 +587,7 @@ func TestGetTopics(t *testing.T) {
 func TestUpdateTopic(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	topic, err := repo.GetOneTopic(context.Background(), 1)
@@ -641,7 +641,7 @@ func TestUpdateTopic(t *testing.T) {
 func TestDeleteTopic(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Get topic with ID 1
@@ -668,7 +668,7 @@ func TestDeleteTopic(t *testing.T) {
 func TestDeleteTopic_NotFound(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to delete non-existent topic
@@ -686,7 +686,7 @@ func TestDeleteTopic_NotFound(t *testing.T) {
 func TestCreatePost(t *testing.T) {
 	repo, err := initRepoWithMockUsersAndTopics()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for _, mp := range mockPosts {
 		t.Run(mp.title, func(t *testing.T) {
@@ -706,7 +706,7 @@ func TestCreatePost(t *testing.T) {
 func TestGetPostByID(t *testing.T) {
 	repo, err := initRepoWithMockUsersTopicsAndPosts()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 	for i, mp := range mockPosts {
 		t.Run(mp.title, func(t *testing.T) {
@@ -739,7 +739,7 @@ func TestGetPostByID(t *testing.T) {
 func TestGetPostByID_NotFound(t *testing.T) {
 	repo, err := initRepoWithMockUsersTopicsAndPosts()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to get non-existent post
@@ -755,7 +755,7 @@ func TestGetPostByID_NotFound(t *testing.T) {
 func TestGetPosts(t *testing.T) {
 	repo, err := initRepoWithMockUsersTopicsAndPosts()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	t.Run("GetAllPosts", func(t *testing.T) {
@@ -871,7 +871,7 @@ func TestGetPosts(t *testing.T) {
 func TestUpdatePost(t *testing.T) {
 	repo, err := initRepoWithMockUsersTopicsAndPosts()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	post, err := repo.GetOnePost(context.Background(), 1)
@@ -923,7 +923,7 @@ func TestUpdatePost(t *testing.T) {
 func TestUpdatePost_TitleAndContent(t *testing.T) {
 	repo, err := initRepoWithMockUsersTopicsAndPosts()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	post, err := repo.GetOnePost(context.Background(), 1)
@@ -960,7 +960,7 @@ func TestUpdatePost_TitleAndContent(t *testing.T) {
 func TestDeletePost(t *testing.T) {
 	repo, err := initRepoWithMockUsersTopicsAndPosts()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Get post with ID 1
@@ -987,7 +987,7 @@ func TestDeletePost(t *testing.T) {
 func TestDeletePost_NotFound(t *testing.T) {
 	repo, err := initRepoWithMockUsersTopicsAndPosts()
 	if err != nil {
-		t.Fatalf("Failed to initialize repository: %v", err)
+		t.Fatalf("Failed to initialise repository: %v", err)
 	}
 
 	// Try to delete non-existent post
