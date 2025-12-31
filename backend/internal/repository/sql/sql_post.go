@@ -61,13 +61,13 @@ func (r *sqlRepository) GetPosts(
 func (r *sqlRepository) UpdatePost(
 	ctx context.Context,
 	postID uint,
-	title,
+	title string,
 	content *string,
 ) error {
 	_, err := gorm.
 		G[model.Post](r.db).
 		Where("id = ?", postID).
-		Updates(ctx, model.Post{Title: *title, Content: content})
+		Updates(ctx, model.Post{Title: title, Content: content})
 	return err
 }
 

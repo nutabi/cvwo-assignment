@@ -61,13 +61,13 @@ func (r *sqlRepository) GetOneTopic(
 func (r *sqlRepository) UpdateTopic(
 	ctx context.Context,
 	topicID uint,
-	name,
+	name string,
 	description *string,
 ) error {
 	_, err := gorm.
 		G[model.Topic](r.db).
 		Where("id = ?", topicID).
-		Updates(ctx, model.Topic{Name: *name, Description: description})
+		Updates(ctx, model.Topic{Name: name, Description: description})
 	return err
 }
 

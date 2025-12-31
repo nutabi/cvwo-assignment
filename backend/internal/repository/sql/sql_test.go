@@ -560,7 +560,7 @@ func TestUpdateTopic(t *testing.T) {
 	if err := repo.UpdateTopic(
 		context.Background(),
 		topic.ID,
-		&topic.Name,
+		topic.Name,
 		topic.Description,
 	); err != nil {
 		t.Fatalf("Failed to update topic name: %v", err)
@@ -581,7 +581,7 @@ func TestUpdateTopic(t *testing.T) {
 	if err := repo.UpdateTopic(
 		context.Background(),
 		updatedTopic.ID,
-		&updatedTopic.Name,
+		updatedTopic.Name,
 		updatedTopic.Description,
 	); err != nil {
 		t.Fatalf("Failed to update topic description: %v", err)

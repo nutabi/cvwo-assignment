@@ -112,7 +112,7 @@ func (s *primaryService) UpdatePost(
 	if err := s.repo.UpdatePost(
 		ctx,
 		post.ID,
-		&post.Title,
+		post.Title,
 		post.Content,
 	); err != nil {
 		return err

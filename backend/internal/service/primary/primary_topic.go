@@ -116,7 +116,7 @@ func (s *primaryService) UpdateTopic(
 	if err := s.repo.UpdateTopic(
 		ctx,
 		topic.ID,
-		&topic.Name,
+		topic.Name,
 		topic.Description,
 	); err != nil {
 		return errors.Join(service.ErrDatabaseError, err)

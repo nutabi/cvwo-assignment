@@ -23,7 +23,7 @@ type Repository interface {
 	CreateTopic(ctx context.Context, topic *model.Topic) error
 	GetOneTopic(ctx context.Context, id uint) (*model.Topic, error)
 	GetTopics(ctx context.Context, limit, offset int, userID *uint) ([]model.Topic, error)
-	UpdateTopic(ctx context.Context, topicID uint, name, description *string) error
+	UpdateTopic(ctx context.Context, topicID uint, name string, description *string) error
 	DeleteTopic(ctx context.Context, topicID uint) error
 
 	// Post-related repository methods
@@ -31,6 +31,6 @@ type Repository interface {
 	CreatePost(ctx context.Context, post *model.Post) error
 	GetOnePost(ctx context.Context, id uint) (*model.Post, error)
 	GetPosts(ctx context.Context, limit, offset int, topicID *uint, userID *uint) ([]model.Post, error)
-	UpdatePost(ctx context.Context, postID uint, title, content *string) error
+	UpdatePost(ctx context.Context, postID uint, title string, content *string) error
 	DeletePost(ctx context.Context, postID uint) error
 }
