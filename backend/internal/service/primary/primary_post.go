@@ -28,7 +28,7 @@ func (s *primaryService) CreatePost(
 	}
 
 	// Return the newly created post's info
-	info := service.InfoFromPost(&newPost, false)
+	info := service.InfoFromPost(&newPost)
 	return &info, nil
 }
 
@@ -61,7 +61,7 @@ func (s *primaryService) FetchPosts(
 	// Convert to DTOs
 	postInfos := make([]service.PostInfo, 0, len(posts))
 	for _, post := range posts {
-		info := service.InfoFromPost(&post, withComments)
+		info := service.InfoFromPost(&post)
 		postInfos = append(postInfos, info)
 	}
 
@@ -79,7 +79,7 @@ func (s *primaryService) FetchPostByID(
 	}
 
 	// Convert to DTO
-	info := service.InfoFromPost(post, true)
+	info := service.InfoFromPost(post)
 	return &info, nil
 }
 

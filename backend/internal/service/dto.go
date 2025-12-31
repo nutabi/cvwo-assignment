@@ -9,9 +9,9 @@ import (
 type UserProfile struct {
 	UserID    uint       `json:"user_id"`
 	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at"`
 	Username  string     `json:"username"`
-	Email     *string    `json:"email,omitempty"`
+	Email     *string    `json:"email"`
 	AvatarUrl *string    `json:"avatar_url"`
 	Bio       *string    `json:"bio"`
 }
@@ -28,14 +28,15 @@ type TopicInfo struct {
 }
 
 type PostInfo struct {
-	PostID    uint          `json:"post_id"`
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
-	Title     string        `json:"title"`
-	Content   string        `json:"content"`
-	Author    UserProfile   `json:"author"`
-	TopicID   uint          `json:"topic_id"`
-	Comments  []CommentInfo `json:"comments,omitempty"`
+	PostID    uint        `json:"post_id"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
+	Title     string      `json:"title"`
+	Content   string      `json:"content"`
+	Author    UserProfile `json:"author"`
+	TopicID   uint        `json:"topic_id"`
+
+	Comments []CommentInfo `json:"comments,omitempty"`
 }
 
 type CommentInfo struct {
@@ -62,7 +63,7 @@ func ProfileFromUser(user *model.User, isPrivate bool) UserProfile {
 	return profile
 }
 
-func InfoFromTopic(topic *model.Topic, withPosts bool) TopicInfo {
+func InfoFromTopic(topic *model.Topic) TopicInfo {
 	// Handle nil description
 	desc := ""
 	if topic.Description != nil {
@@ -78,36 +79,25 @@ func InfoFromTopic(topic *model.Topic, withPosts bool) TopicInfo {
 		Author:      ProfileFromUser(topic.Author, false),
 	}
 
-	// Handle posts if requested
-	if withPosts && topic.Posts != nil {
-		info.Posts = make([]PostInfo, 0, len(topic.Posts))
-		for _, post := range topic.Posts {
-			info.Posts = append(info.Posts, InfoFromPost(post, false))
-		}
-	}
 	return info
 }
 
-func InfoFromPost(post *model.Post, withComments bool) PostInfo {
-	info := PostInfo{
+func InfoFromPost(post *model.Post) PostInfo {
+	// Handle nil content
+	content := ""
+	if post.Content != nil {
+		content = *post.Content
+	}
+
+	return PostInfo{
 		PostID:    post.ID,
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
 		Title:     post.Title,
-		Content:   *post.Content,
+		Content:   content,
 		Author:    ProfileFromUser(post.Author, false),
 		TopicID:   post.TopicID,
 	}
-
-	// Handle comments if requested
-	if withComments && post.Comments != nil {
-		info.Comments = make([]CommentInfo, 0, len(post.Comments))
-		for _, comment := range post.Comments {
-			info.Comments = append(info.Comments, InfoFromComment(comment))
-		}
-	}
-
-	return info
 }
 
 func InfoFromComment(comment *model.Comment) CommentInfo {

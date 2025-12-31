@@ -28,7 +28,7 @@ func (s *primaryService) CreateTopic(
 	}
 
 	// Return the newly created topic's info
-	info := service.InfoFromTopic(&newTopic, false)
+	info := service.InfoFromTopic(&newTopic)
 	return &info, nil
 }
 
@@ -47,7 +47,7 @@ func (s *primaryService) FetchTopicByID(
 	}
 
 	// Convert to DTO
-	info := service.InfoFromTopic(topic, true)
+	info := service.InfoFromTopic(topic)
 	return &info, nil
 }
 
@@ -73,7 +73,7 @@ func (s *primaryService) FetchTopics(
 	// Convert to DTO
 	infos := make([]service.TopicInfo, 0, len(topics))
 	for _, topic := range topics {
-		infos = append(infos, service.InfoFromTopic(&topic, withPosts))
+		infos = append(infos, service.InfoFromTopic(&topic))
 	}
 	return infos, nil
 }
