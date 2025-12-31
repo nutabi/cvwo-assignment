@@ -28,8 +28,8 @@ type Service interface {
 
 	// Post-related services
 
-	CreatePost(ctx context.Context, userID uint, topicID uint, title, content string) (*PostInfo, error)
-	FetchPosts(ctx context.Context, limit, offset int, postID, userID uint, withComments bool) ([]PostInfo, error)
+	CreatePost(ctx context.Context, userID uint, topicID uint, title string, content *string) (*PostInfo, error)
+	FetchPosts(ctx context.Context, limit, offset int, topicID, userID uint, withComments bool) ([]PostInfo, error)
 	FetchPostByID(ctx context.Context, postID uint) (*PostInfo, error)
 	UpdatePost(ctx context.Context, postID, userID uint, title, content *string) error
 	DeletePost(ctx context.Context, postID, userID uint) error

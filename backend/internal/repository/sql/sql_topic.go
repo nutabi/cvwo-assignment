@@ -43,25 +43,20 @@ func (r *sqlRepository) CreateTopic(
 	ctx context.Context,
 	topic *model.Topic,
 ) error {
-	err := gorm.
+	return gorm.
 		G[model.Topic](&r.db).
 		Create(ctx, topic)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (r *sqlRepository) GetTopicByID(
 	ctx context.Context,
 	id uint,
 ) (model.Topic, error) {
-	topic, err := gorm.
+	return gorm.
 		G[model.Topic](&r.db).
 		Preload("Author", nil).
 		Where("id = ?", id).
 		First(ctx)
-	return topic, err
 }
 
 func (r *sqlRepository) UpdateTopic(

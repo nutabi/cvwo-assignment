@@ -32,7 +32,7 @@ func handleCreatePost(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Delegate to service layer to create post
-		post, err := svc.CreatePost(c.Request.Context(), user.ID, topicID, req.Title, *req.Content)
+		post, err := svc.CreatePost(c.Request.Context(), user.ID, topicID, req.Title, req.Content)
 		if err != nil {
 			handleServiceError(c, err)
 			return
@@ -49,7 +49,7 @@ func handleListPosts(svc service.Service) gin.HandlerFunc {
 		limit, offset := tryGetPagingParams(c)
 
 		// Parse filter parameters
-		postID := tryGetIDQuery(c, "post_id")
+		topicID := tryGetIDQuery(c, "topic_id")
 		userID := tryGetIDQuery(c, "user_id")
 
 		// Parse preload comments
@@ -60,7 +60,7 @@ func handleListPosts(svc service.Service) gin.HandlerFunc {
 			c.Request.Context(),
 			limit,
 			offset,
-			postID,
+			topicID,
 			userID,
 			withComments,
 		)
