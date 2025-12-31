@@ -7,6 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
+func (r *sqlRepository) CreateUser(
+	ctx context.Context,
+	user *model.User,
+) error {
+	return gorm.
+		G[model.User](r.db).
+		Create(ctx, user)
+}
+
 func (r *sqlRepository) GetUserByID(
 	ctx context.Context,
 	id uint,
@@ -29,7 +38,40 @@ func (r *sqlRepository) GetUserByUsername(
 		G[model.User](r.db).
 		Where("username = ?", username).
 		First(ctx)
-	return &user, err
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *sqlRepository) CheckUsernameExists(
+	ctx context.Context,
+	username string,
+) (bool, error) {
+	var count int64
+	err := r.db.Model(&model.User{}).
+		Where("username = ?", username).
+		Count(&count).
+		Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (r *sqlRepository) CheckEmailExists(
+	ctx context.Context,
+	email string,
+) (bool, error) {
+	var count int64
+	err := r.db.Model(&model.User{}).
+		Where("email = ?", email).
+		Count(&count).
+		Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
 func (r *sqlRepository) UpdateUser(
@@ -43,43 +85,4 @@ func (r *sqlRepository) UpdateUser(
 		Where("id = ?", userID).
 		Updates(ctx, model.User{AvatarURL: avatarURL, Bio: bio})
 	return err
-}
-
-func (r *sqlRepository) CheckUsernameExists(
-	ctx context.Context,
-	username string,
-) (bool, error) {
-	users, err := gorm.
-		G[model.User](r.db).
-		Where("username = ?", username).
-		Limit(1).
-		Find(ctx)
-	if err != nil {
-		return false, err
-	}
-	return len(users) > 0, nil
-}
-
-func (r *sqlRepository) CheckEmailExists(
-	ctx context.Context,
-	email string,
-) (bool, error) {
-	users, err := gorm.
-		G[model.User](r.db).
-		Where("email = ?", email).
-		Limit(1).
-		Find(ctx)
-	if err != nil {
-		return false, err
-	}
-	return len(users) > 0, nil
-}
-
-func (r *sqlRepository) CreateUser(
-	ctx context.Context,
-	user *model.User,
-) error {
-	return gorm.
-		G[model.User](r.db).
-		Create(ctx, user)
 }

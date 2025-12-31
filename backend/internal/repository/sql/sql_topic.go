@@ -7,6 +7,31 @@ import (
 	"gorm.io/gorm"
 )
 
+func (r *sqlRepository) CreateTopic(
+	ctx context.Context,
+	topic *model.Topic,
+) error {
+	return gorm.
+		G[model.Topic](r.db).
+		Create(ctx, topic)
+}
+
+func (r *sqlRepository) GetOneTopic(
+	ctx context.Context,
+	id uint,
+) (*model.Topic, error) {
+	topic, err := gorm.
+		G[model.Topic](r.db).
+		Preload("Author", nil).
+		Preload("Posts", nil).
+		Where("id = ?", id).
+		First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &topic, nil
+}
+
 func (r *sqlRepository) GetTopics(
 	ctx context.Context,
 	limit, offset int,
@@ -31,31 +56,6 @@ func (r *sqlRepository) GetTopics(
 	}
 
 	return topics, nil
-}
-
-func (r *sqlRepository) CreateTopic(
-	ctx context.Context,
-	topic *model.Topic,
-) error {
-	return gorm.
-		G[model.Topic](r.db).
-		Create(ctx, topic)
-}
-
-func (r *sqlRepository) GetOneTopic(
-	ctx context.Context,
-	id uint,
-) (*model.Topic, error) {
-	topic, err := gorm.
-		G[model.Topic](r.db).
-		Preload("Author", nil).
-		Preload("Posts", nil).
-		Where("id = ?", id).
-		First(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &topic, err
 }
 
 func (r *sqlRepository) UpdateTopic(
