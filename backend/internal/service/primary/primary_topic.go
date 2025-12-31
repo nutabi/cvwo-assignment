@@ -11,7 +11,7 @@ import (
 
 func (s *primaryService) CreateTopic(
 	ctx context.Context,
-	user *model.User,
+	userID uint,
 	title string,
 	description *string,
 ) (*service.TopicInfo, error) {
@@ -19,7 +19,7 @@ func (s *primaryService) CreateTopic(
 	newTopic := model.Topic{
 		Name:        title,
 		Description: description,
-		AuthorID:    user.ID,
+		AuthorID:    userID,
 	}
 
 	// Save new topic via repository

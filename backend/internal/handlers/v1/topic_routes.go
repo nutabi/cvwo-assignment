@@ -58,7 +58,7 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 		// Delegate to service layer to create topic
 		topic, err := svc.CreateTopic(
 			c.Request.Context(),
-			user,
+			user.ID,
 			req.Title,
 			req.Description,
 		)
