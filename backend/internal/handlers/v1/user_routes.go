@@ -70,17 +70,17 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 
 		// At least one field must be provided
 		if updateReq.AvatarUrl == nil && updateReq.Bio == nil {
-			handleError(c, http.StatusUnprocessableEntity, "At least one field (avatar_url or bio) must be provided")
+			handleError(c, http.StatusUnprocessableEntity, "at least one field (avatar_url or bio) must be provided")
 			return
 		}
 		// Validate avatar URL if provided
 		if updateReq.AvatarUrl != nil && !utility.ValidateAvatarUrl(*updateReq.AvatarUrl) {
-			handleError(c, http.StatusUnprocessableEntity, "Invalid avatar URL format")
+			handleError(c, http.StatusUnprocessableEntity, "invalid avatar URL format")
 			return
 		}
 		// Validate bio if provided
 		if updateReq.Bio != nil && !utility.ValidateBio(*updateReq.Bio) {
-			handleError(c, http.StatusUnprocessableEntity, "Invalid bio format")
+			handleError(c, http.StatusUnprocessableEntity, "invalid bio format")
 			return
 		}
 
