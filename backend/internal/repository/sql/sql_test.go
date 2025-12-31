@@ -158,7 +158,12 @@ func TestUpdateUser(t *testing.T) {
 			// Update bio
 			newBio := "Updated bio for " + mu.username
 			user.Bio = &newBio
-			if err := repo.UpdateUser(context.Background(), &user); err != nil {
+			if err := repo.UpdateUser(
+				context.Background(),
+				user.ID,
+				user.AvatarURL,
+				user.Bio,
+			); err != nil {
 				t.Fatalf("Failed to update user: %v", err)
 			}
 
@@ -174,7 +179,12 @@ func TestUpdateUser(t *testing.T) {
 			// Update avatar URL
 			newAvatarUrl := "http://example.com/new_avatar_" + mu.username + ".png"
 			updatedUser.AvatarURL = &newAvatarUrl
-			if err := repo.UpdateUser(context.Background(), &updatedUser); err != nil {
+			if err := repo.UpdateUser(
+				context.Background(),
+				updatedUser.ID,
+				updatedUser.AvatarURL,
+				updatedUser.Bio,
+			); err != nil {
 				t.Fatalf("Failed to update user avatar URL: %v", err)
 			}
 
@@ -354,7 +364,12 @@ func TestUpdateUser_WithAvatarAndBio(t *testing.T) {
 	user.AvatarURL = &newAvatar
 	user.Bio = &newBio
 
-	err = repo.UpdateUser(context.Background(), &user)
+	err = repo.UpdateUser(
+		context.Background(),
+		user.ID,
+		user.AvatarURL,
+		user.Bio,
+	)
 	if err != nil {
 		t.Fatalf("Failed to update user: %v", err)
 	}
@@ -542,7 +557,12 @@ func TestUpdateTopic(t *testing.T) {
 	// Update name
 	newName := "Updated General Discussion"
 	topic.Name = newName
-	if err := repo.UpdateTopic(context.Background(), &topic); err != nil {
+	if err := repo.UpdateTopic(
+		context.Background(),
+		topic.ID,
+		&topic.Name,
+		topic.Description,
+	); err != nil {
 		t.Fatalf("Failed to update topic name: %v", err)
 	}
 
@@ -558,7 +578,12 @@ func TestUpdateTopic(t *testing.T) {
 	// Update description
 	newDesc := "An updated description for general topics"
 	updatedTopic.Description = &newDesc
-	if err := repo.UpdateTopic(context.Background(), &updatedTopic); err != nil {
+	if err := repo.UpdateTopic(
+		context.Background(),
+		updatedTopic.ID,
+		&updatedTopic.Name,
+		updatedTopic.Description,
+	); err != nil {
 		t.Fatalf("Failed to update topic description: %v", err)
 	}
 

@@ -95,7 +95,12 @@ func (s *primaryService) UpdateCurrentUser(
 	}
 
 	// Save changes via repository
-	if err := s.repo.UpdateUser(ctx, user); err != nil {
+	if err := s.repo.UpdateUser(
+		ctx,
+		user.ID,
+		user.AvatarURL,
+		user.Bio,
+	); err != nil {
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 

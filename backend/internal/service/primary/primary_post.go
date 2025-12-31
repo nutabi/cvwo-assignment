@@ -110,7 +110,12 @@ func (s *primaryService) UpdatePost(
 	}
 
 	// Save updated post via repository
-	if err := s.repo.UpdatePost(ctx, &post); err != nil {
+	if err := s.repo.UpdatePost(
+		ctx,
+		post.ID,
+		&post.Title,
+		post.Content,
+	); err != nil {
 		return err
 	}
 

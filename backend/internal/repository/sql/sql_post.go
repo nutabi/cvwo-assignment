@@ -60,11 +60,16 @@ func (r *sqlRepository) GetPosts(
 	return posts, nil
 }
 
-func (r *sqlRepository) UpdatePost(ctx context.Context, post *model.Post) error {
+func (r *sqlRepository) UpdatePost(
+	ctx context.Context,
+	postID uint,
+	title,
+	content *string,
+) error {
 	_, err := gorm.
 		G[model.Post](r.db).
-		Where("id = ?", post.ID).
-		Updates(ctx, *post)
+		Where("id = ?", postID).
+		Updates(ctx, model.Post{Title: *title, Content: content})
 	return err
 }
 

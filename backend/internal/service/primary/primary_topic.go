@@ -114,7 +114,12 @@ func (s *primaryService) UpdateTopic(
 	}
 
 	// Save updated topic via repository
-	if err := s.repo.UpdateTopic(ctx, &topic); err != nil {
+	if err := s.repo.UpdateTopic(
+		ctx,
+		topic.ID,
+		&topic.Name,
+		topic.Description,
+	); err != nil {
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 

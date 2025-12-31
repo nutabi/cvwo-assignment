@@ -31,12 +31,14 @@ func (r *sqlRepository) GetUserByUsername(
 
 func (r *sqlRepository) UpdateUser(
 	ctx context.Context,
-	user *model.User,
+	userID uint,
+	avatarUrl,
+	bio *string,
 ) error {
 	_, err := gorm.
 		G[model.User](r.db).
-		Where("id = ?", user.ID).
-		Updates(ctx, model.User{AvatarURL: user.AvatarURL, Bio: user.Bio})
+		Where("id = ?", userID).
+		Updates(ctx, model.User{AvatarURL: avatarUrl, Bio: bio})
 	return err
 }
 
