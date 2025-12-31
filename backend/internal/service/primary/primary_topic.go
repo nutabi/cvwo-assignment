@@ -69,9 +69,9 @@ func (s *primaryService) FetchTopics(
 	}
 
 	// Convert to DTO
-	infos := make([]*service.TopicInfo, 0, len(topics))
-	for _, topic := range topics {
-		infos = append(infos, service.InfoFromTopic(&topic))
+	infos := make([]*service.TopicInfo, len(topics))
+	for i, topic := range topics {
+		infos[i] = service.InfoFromTopic(&topic)
 	}
 	return infos, nil
 }

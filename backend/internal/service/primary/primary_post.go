@@ -60,10 +60,10 @@ func (s *primaryService) FetchPosts(
 	}
 
 	// Convert to DTOs
-	postInfos := make([]*service.PostInfo, 0, len(posts))
-	for _, post := range posts {
+	postInfos := make([]*service.PostInfo, len(posts))
+	for i, post := range posts {
 		info := service.InfoFromPost(&post)
-		postInfos = append(postInfos, info)
+		postInfos[i] = info
 	}
 
 	return postInfos, nil
