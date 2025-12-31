@@ -29,7 +29,7 @@ func (s *primaryService) CreatePost(
 
 	// Return the newly created post's info
 	info := service.InfoFromPost(&newPost)
-	return &info, nil
+	return info, nil
 }
 
 func (s *primaryService) FetchPosts(
@@ -61,7 +61,7 @@ func (s *primaryService) FetchPosts(
 	postInfos := make([]service.PostInfo, 0, len(posts))
 	for _, post := range posts {
 		info := service.InfoFromPost(&post)
-		postInfos = append(postInfos, info)
+		postInfos = append(postInfos, *info)
 	}
 
 	return postInfos, nil
@@ -79,7 +79,7 @@ func (s *primaryService) FetchPostByID(
 
 	// Convert to DTO
 	info := service.InfoFromPost(post)
-	return &info, nil
+	return info, nil
 }
 
 func (s *primaryService) UpdatePost(
@@ -115,7 +115,7 @@ func (s *primaryService) UpdatePost(
 		post.Title,
 		post.Content,
 	); err != nil {
-		return err
+		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	return nil
@@ -139,7 +139,7 @@ func (s *primaryService) DeletePost(
 
 	// Delete post via repository
 	if err := s.repo.DeletePost(ctx, postID); err != nil {
-		return err
+		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	return nil

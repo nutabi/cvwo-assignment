@@ -48,8 +48,8 @@ type CommentInfo struct {
 	PostID    uint        `json:"post_id"`
 }
 
-func ProfileFromUser(user *model.User, isPrivate bool) UserProfile {
-	profile := UserProfile{
+func ProfileFromUser(user *model.User, isPrivate bool) *UserProfile {
+	profile := &UserProfile{
 		UserID:    user.ID,
 		CreatedAt: user.CreatedAt,
 		Username:  user.Username,
@@ -63,50 +63,50 @@ func ProfileFromUser(user *model.User, isPrivate bool) UserProfile {
 	return profile
 }
 
-func InfoFromTopic(topic *model.Topic) TopicInfo {
+func InfoFromTopic(topic *model.Topic) *TopicInfo {
 	// Handle nil description
 	desc := ""
 	if topic.Description != nil {
 		desc = *topic.Description
 	}
 
-	info := TopicInfo{
+	info := &TopicInfo{
 		TopicID:     topic.ID,
 		CreatedAt:   topic.CreatedAt,
 		UpdatedAt:   topic.UpdatedAt,
 		Name:        topic.Name,
 		Description: desc,
-		Author:      ProfileFromUser(topic.Author, false),
+		Author:      *ProfileFromUser(topic.Author, false),
 	}
 
 	return info
 }
 
-func InfoFromPost(post *model.Post) PostInfo {
+func InfoFromPost(post *model.Post) *PostInfo {
 	// Handle nil content
 	content := ""
 	if post.Content != nil {
 		content = *post.Content
 	}
 
-	return PostInfo{
+	return &PostInfo{
 		PostID:    post.ID,
 		CreatedAt: post.CreatedAt,
 		UpdatedAt: post.UpdatedAt,
 		Title:     post.Title,
 		Content:   content,
-		Author:    ProfileFromUser(post.Author, false),
+		Author:    *ProfileFromUser(post.Author, false),
 		TopicID:   post.TopicID,
 	}
 }
 
-func InfoFromComment(comment *model.Comment) CommentInfo {
-	return CommentInfo{
+func InfoFromComment(comment *model.Comment) *CommentInfo {
+	return &CommentInfo{
 		CommentID: comment.ID,
 		CreatedAt: comment.CreatedAt,
 		UpdatedAt: comment.UpdatedAt,
 		Content:   comment.Content,
-		Author:    ProfileFromUser(comment.Author, false),
+		Author:    *ProfileFromUser(comment.Author, false),
 		PostID:    comment.PostID,
 	}
 }

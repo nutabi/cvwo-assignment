@@ -50,7 +50,7 @@ func (s *primaryService) RegisterUser(
 
 	// Return the newly created user's profile
 	profile := service.ProfileFromUser(&newUser, true)
-	return &profile, nil
+	return profile, nil
 }
 
 func (s *primaryService) FetchUserByID(ctx context.Context, id uint) (*service.UserProfile, error) {
@@ -66,13 +66,13 @@ func (s *primaryService) FetchUserByID(ctx context.Context, id uint) (*service.U
 
 	// Map repository user to service user profile
 	profile := service.ProfileFromUser(user, false)
-	return &profile, nil
+	return profile, nil
 }
 
 func (s *primaryService) FetchCurrentUser(ctx context.Context, user *model.User) (*service.UserProfile, error) {
 	// Map repository user to service user profile
 	profile := service.ProfileFromUser(user, true)
-	return &profile, nil
+	return profile, nil
 }
 
 func (s *primaryService) UpdateCurrentUser(
