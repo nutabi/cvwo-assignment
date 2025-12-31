@@ -20,8 +20,8 @@ var (
 	// Topic not found error
 	ErrTopicNotFound = errors.New("topic not found")
 
-	// Unauthorized access error
-	ErrUnauthorized = errors.New("unauthorized access")
+	// Forbidden access error
+	ErrForbidden = errors.New("forbidden")
 
 	// User not found error
 	ErrUserNotFound = errors.New("user not found")

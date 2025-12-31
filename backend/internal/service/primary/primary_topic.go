@@ -97,7 +97,7 @@ func (s *primaryService) UpdateTopic(
 
 	// Check if the user is the author
 	if topic.AuthorID != userID {
-		return service.ErrUnauthorized
+		return service.ErrForbidden
 	}
 
 	// Make sure at least one field is being updated
@@ -138,7 +138,7 @@ func (s *primaryService) DeleteTopic(
 
 	// Check if the user is the author
 	if topic.AuthorID != userID {
-		return service.ErrUnauthorized
+		return service.ErrForbidden
 	}
 
 	// Delete topic via repository
