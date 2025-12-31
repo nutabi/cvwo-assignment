@@ -8,18 +8,17 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
 
-// Handle GET {ROOT}/users/:id
+// Handle GET {ROOT}/users/:user_id
 func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse user ID from path
-		userId, ok := utility.TryParseID(c.Param("id"))
+		userID, ok := mustGetIDParam(c, "user_id")
 		if !ok {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid ID format")
 			return
 		}
 
 		// Delegate to service layer to get user profile
-		userProfile, err := svc.FetchUserByID(c.Request.Context(), userId)
+		userProfile, err := svc.FetchUserByID(c.Request.Context(), userID)
 		if err != nil {
 			handleServiceError(c, err)
 			return
@@ -34,7 +33,7 @@ func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user := retrieveUser(c)
+		user := mustRetrieveUser(c)
 		if user == nil {
 			return
 		}
@@ -55,7 +54,7 @@ func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user := retrieveUser(c)
+		user := mustRetrieveUser(c)
 		if user == nil {
 			return
 		}
@@ -65,23 +64,23 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 			AvatarUrl *string `form:"avatar_url" json:"avatar_url"`
 			Bio       *string `form:"bio" json:"bio"`
 		}
-		if !parseRequestBody(c, &updateReq) {
+		if !mustBindReqBody(c, &updateReq) {
 			return
 		}
 
 		// At least one field must be provided
 		if updateReq.AvatarUrl == nil && updateReq.Bio == nil {
-			respondWithError(c, http.StatusUnprocessableEntity, "At least one field (avatar_url or bio) must be provided")
+			handleError(c, http.StatusUnprocessableEntity, "At least one field (avatar_url or bio) must be provided")
 			return
 		}
 		// Validate avatar URL if provided
 		if updateReq.AvatarUrl != nil && !utility.ValidateAvatarUrl(*updateReq.AvatarUrl) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid avatar URL format")
+			handleError(c, http.StatusUnprocessableEntity, "Invalid avatar URL format")
 			return
 		}
 		// Validate bio if provided
 		if updateReq.Bio != nil && !utility.ValidateBio(*updateReq.Bio) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid bio format")
+			handleError(c, http.StatusUnprocessableEntity, "Invalid bio format")
 			return
 		}
 

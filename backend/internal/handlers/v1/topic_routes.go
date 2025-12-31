@@ -5,24 +5,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
-	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
 
 // Handle GET {ROOT}/topics
 func handleListTopics(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse query parameters for pagination
-		limit, offset := retrievePaginationParams(c)
+		limit, offset := tryGetPagingParams(c)
 
 		// Parse filter parameters
-		userID, ok := utility.TryParseID(c.DefaultQuery("user_id", "0"))
-		if !ok {
-			respondWithError(c, http.StatusUnprocessableEntity, "invalid user_id format")
-			return
-		}
+		userID := tryGetIDQuery(c, "user_id")
 
 		// Parse preload posts
-		withPosts := getBoolParam(c, "with_posts", false)
+		withPosts := tryGetBoolQuery(c, "with_posts", false)
 
 		// Delegate to service layer to get list of topics
 		topics, err := svc.FetchTopics(
@@ -46,7 +41,7 @@ func handleListTopics(svc service.Service) gin.HandlerFunc {
 func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user := retrieveUser(c)
+		user := mustRetrieveUser(c)
 		if user == nil {
 			return
 		}
@@ -56,7 +51,7 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 			Title       string  `json:"title" form:"title" binding:"required"`
 			Description *string `json:"description" form:"description"`
 		}
-		if !parseRequestBody(c, &req) {
+		if !mustBindReqBody(c, &req) {
 			return
 		}
 
@@ -77,20 +72,19 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle GET {ROOT}/topics/:id
+// Handle GET {ROOT}/topics/:topic_id
 func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Parse topic ID from path
-		topicId, ok := utility.TryParseID(ctx.Param("id"))
+		topicID, ok := mustGetIDParam(ctx, "topic_id")
 		if !ok {
-			respondWithError(ctx, http.StatusUnprocessableEntity, "invalid topic ID")
 			return
 		}
 
 		// Delegate to service layer to get topic details
 		topic, err := svc.FetchTopicByID(
 			ctx.Request.Context(),
-			topicId,
+			topicID,
 		)
 		if err != nil {
 			handleServiceError(ctx, err)
@@ -102,19 +96,18 @@ func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle PATCH {ROOT}/topics/:id
+// Handle PATCH {ROOT}/topics/:topic_id
 func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user := retrieveUser(c)
+		user := mustRetrieveUser(c)
 		if user == nil {
 			return
 		}
 
 		// Parse topic ID from path
-		topicId, ok := utility.TryParseID(c.Param("id"))
+		topicID, ok := mustGetIDParam(c, "topic_id")
 		if !ok {
-			respondWithError(c, http.StatusUnprocessableEntity, "invalid topic ID")
 			return
 		}
 
@@ -123,14 +116,14 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 			Title       *string `json:"title" form:"title"`
 			Description *string `json:"description" form:"description"`
 		}
-		if !parseRequestBody(c, &req) {
+		if !mustBindReqBody(c, &req) {
 			return
 		}
 
 		// Delegate to service layer to update topic
 		if err := svc.UpdateTopic(
 			c.Request.Context(),
-			topicId,
+			topicID,
 			user.ID,
 			req.Title,
 			req.Description,
@@ -148,22 +141,21 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 func handleDeleteTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user := retrieveUser(c)
+		user := mustRetrieveUser(c)
 		if user == nil {
 			return
 		}
 
 		// Parse topic ID from path
-		topicId, ok := utility.TryParseID(c.Param("id"))
+		topicID, ok := mustGetIDParam(c, "topic_id")
 		if !ok {
-			respondWithError(c, http.StatusUnprocessableEntity, "invalid topic ID")
 			return
 		}
 
 		// Delegate to service layer to delete topic
 		if err := svc.DeleteTopic(
 			c.Request.Context(),
-			topicId,
+			topicID,
 			user.ID,
 		); err != nil {
 			handleServiceError(c, err)

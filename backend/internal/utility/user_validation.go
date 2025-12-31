@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/mail"
-	"strconv"
 	"strings"
 
 	"golang.org/x/crypto/argon2"
@@ -156,15 +155,6 @@ func ValidateUsername(username string) bool {
 	}
 
 	return true
-}
-
-// Try to parse ID from string to uint
-func TryParseID(idStr string) (uint, bool) {
-	num, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || num < 0 {
-		return 0, false
-	}
-	return uint(num), true
 }
 
 // Validate email using net/mail package

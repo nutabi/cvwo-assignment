@@ -16,19 +16,19 @@ func handleUserRegistration(svc service.Service) gin.HandlerFunc {
 			Email    string `form:"email" json:"email"`
 			Password string `form:"password" json:"password"`
 		}
-		if !parseRequestBody(c, &reqBody) {
+		if !mustBindReqBody(c, &reqBody) {
 			return
 		}
 
 		// Validate input
 		if !utility.ValidateUsername(reqBody.Username) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid or missing username")
+			handleError(c, http.StatusUnprocessableEntity, "Invalid or missing username")
 			return
 		} else if !utility.ValidateEmail(reqBody.Email) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid or missing email")
+			handleError(c, http.StatusUnprocessableEntity, "Invalid or missing email")
 			return
 		} else if !utility.ValidatePassword(reqBody.Password) {
-			respondWithError(c, http.StatusUnprocessableEntity, "Invalid or missing password")
+			handleError(c, http.StatusUnprocessableEntity, "Invalid or missing password")
 			return
 		}
 

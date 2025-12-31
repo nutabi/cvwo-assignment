@@ -18,15 +18,15 @@ func RegisterRoutes(
 	r.POST("/auth/register", handleUserRegistration(service))
 
 	// Add user public routes
-	r.GET("/users/:id", handlerPublicUserProfile(service))
+	r.GET("/users/:user_id", handlerPublicUserProfile(service))
 
 	// Add topic public routes
 	r.GET("/topics", handleListTopics(service))
-	r.GET("/topics/:id", handleGetTopicInfo(service))
+	r.GET("/topics/:topic_id", handleGetTopicInfo(service))
 
 	// Add post public routes
-	r.GET("/topics/:id/posts", handleListPosts(service))
-	r.GET("/posts/:id", handleGetPostInfo(service))
+	r.GET("/topics/:topic_id/posts", handleListPosts(service))
+	r.GET("/posts/:post_id", handleGetPostInfo(service))
 
 	protected := r.Group("", authMiddleware.MiddlewareFunc())
 
@@ -36,11 +36,11 @@ func RegisterRoutes(
 
 	// Add topic protected routes
 	protected.POST("/topics", handleCreateTopic(service))
-	protected.PATCH("/topics/:id", handleUpdateTopic(service))
-	protected.DELETE("/topics/:id", handleDeleteTopic(service))
+	protected.PATCH("/topics/:topic_id", handleUpdateTopic(service))
+	protected.DELETE("/topics/:topic_id", handleDeleteTopic(service))
 
 	// Add post protected routes
-	protected.POST("/topics/:id/posts", handleCreatePost(service))
-	protected.PATCH("/posts/:id", handleUpdatePost(service))
-	protected.DELETE("/posts/:id", handleDeletePost(service))
+	protected.POST("/topics/:topic_id/posts", handleCreatePost(service))
+	protected.PATCH("/posts/:post_id", handleUpdatePost(service))
+	protected.DELETE("/posts/:post_id", handleDeletePost(service))
 }
