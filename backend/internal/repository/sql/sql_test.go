@@ -44,6 +44,23 @@ var mockTopics []struct {
 	{"Sports", "Talk about sports and games", 2},
 }
 
+var mockPosts []struct {
+	title    string
+	content  string
+	authorID uint
+	topicID  uint
+} = []struct {
+	title    string
+	content  string
+	authorID uint
+	topicID  uint
+}{
+	{"First Post", "This is the content of the first post", 1, 1},
+	{"Tech Discussion", "Let's talk about Go programming", 1, 2},
+	{"Sports Update", "Latest sports news here", 2, 3},
+	{"Another General Post", "More general discussion", 2, 1},
+}
+
 func initRepo() (repository.Repository, error) {
 	repo, err := sql.Connect(sqlite.Open(":memory:"))
 	if err != nil {
@@ -74,6 +91,17 @@ func addMockTopic(repo repository.Repository, name, description string, authorID
 	return repo.CreateTopic(context.Background(), topic)
 }
 
+func addMockPost(repo repository.Repository, title, content string, authorID, topicID uint) error {
+	cont := content
+	post := &model.Post{
+		Title:    title,
+		Content:  &cont,
+		AuthorID: authorID,
+		TopicID:  topicID,
+	}
+	return repo.CreatePost(context.Background(), post)
+}
+
 func initRepoWithMockUsers() (repository.Repository, error) {
 	repo, err := initRepo()
 	if err != nil {
@@ -94,6 +122,19 @@ func initRepoWithMockUsersAndTopics() (repository.Repository, error) {
 	}
 	for _, mt := range mockTopics {
 		if err := addMockTopic(repo, mt.name, mt.description, mt.authorID); err != nil {
+			return nil, err
+		}
+	}
+	return repo, nil
+}
+
+func initRepoWithMockUsersTopicsAndPosts() (repository.Repository, error) {
+	repo, err := initRepoWithMockUsersAndTopics()
+	if err != nil {
+		return nil, err
+	}
+	for _, mp := range mockPosts {
+		if err := addMockPost(repo, mp.title, mp.content, mp.authorID, mp.topicID); err != nil {
 			return nil, err
 		}
 	}
@@ -526,18 +567,18 @@ func TestGetTopics(t *testing.T) {
 		}
 	})
 
-	t.Run("GetTopicsWithPosts", func(t *testing.T) {
+	t.Run("GetTopicsWithAuthor", func(t *testing.T) {
 		topics, err := repo.GetTopics(context.Background(), 10, 0, nil)
 		if err != nil {
-			t.Fatalf("Failed to get topics with posts: %v", err)
+			t.Fatalf("Failed to get topics: %v", err)
 		}
 		if len(topics) != len(mockTopics) {
 			t.Errorf("Expected %d topics, got %d", len(mockTopics), len(topics))
 		}
-		// Even if no posts exist, Posts field should be initialized (empty slice, not nil)
+		// Author should be preloaded
 		for _, topic := range topics {
-			if topic.Posts == nil {
-				t.Error("Expected Posts to be preloaded (not nil)")
+			if topic.Author == nil {
+				t.Error("Expected Author to be preloaded (not nil)")
 			}
 		}
 	})
@@ -637,5 +678,324 @@ func TestDeleteTopic_NotFound(t *testing.T) {
 	// This test now verifies that deleting a non-existent topic doesn't cause a panic
 	if err != nil {
 		t.Errorf("Unexpected error when deleting non-existent topic: %v", err)
+	}
+}
+
+// Post-related tests
+
+func TestCreatePost(t *testing.T) {
+	repo, err := initRepoWithMockUsersAndTopics()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+	for _, mp := range mockPosts {
+		t.Run(mp.title, func(t *testing.T) {
+			content := mp.content
+			if err := repo.CreatePost(context.Background(), &model.Post{
+				Title:    mp.title,
+				Content:  &content,
+				AuthorID: mp.authorID,
+				TopicID:  mp.topicID,
+			}); err != nil {
+				t.Errorf("Failed to create post %s: %v", mp.title, err)
+			}
+		})
+	}
+}
+
+func TestGetPostByID(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+	for i, mp := range mockPosts {
+		t.Run(mp.title, func(t *testing.T) {
+			post, err := repo.GetOnePost(context.Background(), uint(i+1))
+			if err != nil {
+				t.Errorf("Failed to get post by ID: %v", err)
+			}
+			if post.Title != mp.title {
+				t.Errorf("Retrieved post title does not match. Got %s, want %s", post.Title, mp.title)
+			}
+			if post.Content == nil || *post.Content != mp.content {
+				t.Errorf("Retrieved post content does not match. Got %v, want %s", post.Content, mp.content)
+			}
+			if post.AuthorID != mp.authorID {
+				t.Errorf("Retrieved post authorID does not match. Got %d, want %d", post.AuthorID, mp.authorID)
+			}
+			if post.TopicID != mp.topicID {
+				t.Errorf("Retrieved post topicID does not match. Got %d, want %d", post.TopicID, mp.topicID)
+			}
+			// Verify author is preloaded
+			if post.Author == nil {
+				t.Error("Expected Author to be preloaded (not nil)")
+			} else if post.Author.ID != mp.authorID {
+				t.Errorf("Expected author ID %d, got %d", mp.authorID, post.Author.ID)
+			}
+		})
+	}
+}
+
+func TestGetPostByID_NotFound(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Try to get non-existent post
+	_, err = repo.GetOnePost(context.Background(), 9999)
+	if err == nil {
+		t.Error("Expected error when getting non-existent post, got nil")
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Errorf("Expected gorm.ErrRecordNotFound, got %v", err)
+	}
+}
+
+func TestGetPosts(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	t.Run("GetAllPosts", func(t *testing.T) {
+		posts, err := repo.GetPosts(context.Background(), 10, 0, nil, nil)
+		if err != nil {
+			t.Fatalf("Failed to get all posts: %v", err)
+		}
+		if len(posts) != len(mockPosts) {
+			t.Errorf("Expected %d posts, got %d", len(mockPosts), len(posts))
+		}
+		// Verify authors are preloaded
+		for _, post := range posts {
+			if post.Author == nil {
+				t.Error("Expected Author to be preloaded (not nil)")
+			}
+		}
+	})
+
+	t.Run("GetPostsWithLimit", func(t *testing.T) {
+		posts, err := repo.GetPosts(context.Background(), 2, 0, nil, nil)
+		if err != nil {
+			t.Fatalf("Failed to get posts with limit: %v", err)
+		}
+		if len(posts) != 2 {
+			t.Errorf("Expected 2 posts, got %d", len(posts))
+		}
+	})
+
+	t.Run("GetPostsWithOffset", func(t *testing.T) {
+		posts, err := repo.GetPosts(context.Background(), 10, 1, nil, nil)
+		if err != nil {
+			t.Fatalf("Failed to get posts with offset: %v", err)
+		}
+		if len(posts) != len(mockPosts)-1 {
+			t.Errorf("Expected %d posts, got %d", len(mockPosts)-1, len(posts))
+		}
+	})
+
+	t.Run("GetPostsByTopicID", func(t *testing.T) {
+		topicID := uint(1)
+		posts, err := repo.GetPosts(context.Background(), 10, 0, &topicID, nil)
+		if err != nil {
+			t.Fatalf("Failed to get posts by topic ID: %v", err)
+		}
+		// Count how many posts have topicID = 1 in mockPosts
+		expectedCount := 0
+		for _, mp := range mockPosts {
+			if mp.topicID == 1 {
+				expectedCount++
+			}
+		}
+		if len(posts) != expectedCount {
+			t.Errorf("Expected %d posts for topic 1, got %d", expectedCount, len(posts))
+		}
+		for _, post := range posts {
+			if post.TopicID != topicID {
+				t.Errorf("Expected post to be in topic %d, got %d", topicID, post.TopicID)
+			}
+		}
+	})
+
+	t.Run("GetPostsByUserID", func(t *testing.T) {
+		userID := uint(1)
+		posts, err := repo.GetPosts(context.Background(), 10, 0, nil, &userID)
+		if err != nil {
+			t.Fatalf("Failed to get posts by user ID: %v", err)
+		}
+		// Count how many posts have authorID = 1 in mockPosts
+		expectedCount := 0
+		for _, mp := range mockPosts {
+			if mp.authorID == 1 {
+				expectedCount++
+			}
+		}
+		if len(posts) != expectedCount {
+			t.Errorf("Expected %d posts for user 1, got %d", expectedCount, len(posts))
+		}
+		for _, post := range posts {
+			if post.AuthorID != userID {
+				t.Errorf("Expected post to be authored by user %d, got %d", userID, post.AuthorID)
+			}
+		}
+	})
+
+	t.Run("GetPostsByTopicAndUser", func(t *testing.T) {
+		topicID := uint(1)
+		userID := uint(1)
+		posts, err := repo.GetPosts(context.Background(), 10, 0, &topicID, &userID)
+		if err != nil {
+			t.Fatalf("Failed to get posts by topic and user ID: %v", err)
+		}
+		// Count how many posts have both topicID = 1 and authorID = 1
+		expectedCount := 0
+		for _, mp := range mockPosts {
+			if mp.topicID == 1 && mp.authorID == 1 {
+				expectedCount++
+			}
+		}
+		if len(posts) != expectedCount {
+			t.Errorf("Expected %d posts for topic 1 and user 1, got %d", expectedCount, len(posts))
+		}
+		for _, post := range posts {
+			if post.TopicID != topicID {
+				t.Errorf("Expected post to be in topic %d, got %d", topicID, post.TopicID)
+			}
+			if post.AuthorID != userID {
+				t.Errorf("Expected post to be authored by user %d, got %d", userID, post.AuthorID)
+			}
+		}
+	})
+}
+
+func TestUpdatePost(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	post, err := repo.GetOnePost(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get post: %v", err)
+	}
+
+	// Update title
+	newTitle := "Updated First Post Title"
+	if err := repo.UpdatePost(
+		context.Background(),
+		post.ID,
+		newTitle,
+		post.Content,
+	); err != nil {
+		t.Fatalf("Failed to update post title: %v", err)
+	}
+
+	// Retrieve again to check update
+	updatedPost, err := repo.GetOnePost(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get post after update: %v", err)
+	}
+	if updatedPost.Title != newTitle {
+		t.Errorf("Post title not updated. Got %s, want %s", updatedPost.Title, newTitle)
+	}
+
+	// Update content
+	newContent := "This is the updated content of the first post"
+	if err := repo.UpdatePost(
+		context.Background(),
+		updatedPost.ID,
+		updatedPost.Title,
+		&newContent,
+	); err != nil {
+		t.Fatalf("Failed to update post content: %v", err)
+	}
+
+	// Retrieve again to check update
+	finalPost, err := repo.GetOnePost(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get post after content update: %v", err)
+	}
+	if finalPost.Content == nil || *finalPost.Content != newContent {
+		t.Errorf("Post content not updated. Got %v, want %s", finalPost.Content, newContent)
+	}
+}
+
+func TestUpdatePost_TitleAndContent(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	post, err := repo.GetOnePost(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get post: %v", err)
+	}
+
+	// Update both title and content
+	newTitle := "Completely Updated Post"
+	newContent := "Completely new content here"
+	if err := repo.UpdatePost(
+		context.Background(),
+		post.ID,
+		newTitle,
+		&newContent,
+	); err != nil {
+		t.Fatalf("Failed to update post: %v", err)
+	}
+
+	// Verify both updates
+	updatedPost, err := repo.GetOnePost(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get updated post: %v", err)
+	}
+
+	if updatedPost.Title != newTitle {
+		t.Errorf("Expected title %s, got %s", newTitle, updatedPost.Title)
+	}
+	if updatedPost.Content == nil || *updatedPost.Content != newContent {
+		t.Errorf("Expected content %s, got %v", newContent, updatedPost.Content)
+	}
+}
+
+func TestDeletePost(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Get post with ID 1
+	post, err := repo.GetOnePost(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get post: %v", err)
+	}
+
+	// Delete post
+	if err := repo.DeletePost(context.Background(), post.ID); err != nil {
+		t.Fatalf("Failed to delete post: %v", err)
+	}
+
+	// Verify post is deleted
+	_, err = repo.GetOnePost(context.Background(), 1)
+	if err == nil {
+		t.Error("Expected error when getting deleted post, got nil")
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Errorf("Expected gorm.ErrRecordNotFound, got %v", err)
+	}
+}
+
+func TestDeletePost_NotFound(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialize repository: %v", err)
+	}
+
+	// Try to delete non-existent post
+	err = repo.DeletePost(context.Background(), 9999)
+	// Since the implementation doesn't check if post exists before deleting,
+	// this won't return an error. The delete will just affect 0 rows.
+	// This test verifies that deleting a non-existent post doesn't cause a panic
+	if err != nil {
+		t.Errorf("Unexpected error when deleting non-existent post: %v", err)
 	}
 }
