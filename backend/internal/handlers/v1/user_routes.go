@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nutabi/cvwo-assignment/backend/internal/middleware"
-	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
@@ -35,24 +33,14 @@ func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
 // Handle GET {ROOT}/users/me
 func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Since this is an authenticated route, retrieve user from context
-		user, exists := c.Get(middleware.UserIdentityKey)
-		if !exists {
-			// This should not happen as the middleware ensures authentication.
-			// But handle it gracefully just in case.
-			respondWithError(c, http.StatusUnauthorized, "Unauthorized")
-			return
-		}
-
-		// Gracefully type assert the user
-		userObj, ok := user.(*model.User)
-		if !ok {
-			respondWithError(c, http.StatusInternalServerError, "Failed to retrieve user from context")
+		// Retrieve authenticated user from context
+		user := retrieveUser(c)
+		if user == nil {
 			return
 		}
 
 		// Delegate to service layer to get user profile
-		userProfile, err := svc.FetchCurrentUser(c.Request.Context(), userObj)
+		userProfile, err := svc.FetchCurrentUser(c.Request.Context(), user)
 		if err != nil {
 			handleServiceError(c, err)
 			return
@@ -66,19 +54,9 @@ func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 // Handle PATCH {ROOT}/users/me
 func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Since this is an authenticated route, retrieve user from context
-		user, exists := c.Get(middleware.UserIdentityKey)
-		if !exists {
-			// This should not happen as the middleware ensures authentication.
-			// But handle it gracefully just in case.
-			respondWithError(c, http.StatusUnauthorized, "Unauthorized")
-			return
-		}
-
-		// Gracefully type assert the user
-		userObj, ok := user.(*model.User)
-		if !ok {
-			respondWithError(c, http.StatusInternalServerError, "Failed to retrieve user from context")
+		// Retrieve authenticated user from context
+		user := retrieveUser(c)
+		if user == nil {
 			return
 		}
 
@@ -109,7 +87,7 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Delegate to service layer to update user profile
-		err := svc.UpdateCurrentUser(c.Request.Context(), userObj, updateReq.AvatarUrl, updateReq.Bio)
+		err := svc.UpdateCurrentUser(c.Request.Context(), user, updateReq.AvatarUrl, updateReq.Bio)
 		if err != nil {
 			handleServiceError(c, err)
 			return

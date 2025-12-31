@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nutabi/cvwo-assignment/backend/internal/middleware"
+	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 )
 
@@ -68,4 +70,26 @@ func getBoolParam(c *gin.Context, paramName string, defaultValue bool) (value bo
 		value = defaultValue
 	}
 	return value
+}
+
+func handleUnauthorised(c *gin.Context) {
+	respondWithError(c, http.StatusUnauthorized, "unauthorised")
+}
+
+func handleInternalError(c *gin.Context) {
+	respondWithError(c, http.StatusInternalServerError, "internal server error")
+}
+
+func retrieveUser(c *gin.Context) *model.User {
+	user, exists := c.Get(middleware.UserIdentityKey)
+	if !exists {
+		handleUnauthorised(c)
+		return nil
+	}
+	userObj, ok := user.(*model.User)
+	if !ok {
+		handleInternalError(c)
+		return nil
+	}
+	return userObj
 }

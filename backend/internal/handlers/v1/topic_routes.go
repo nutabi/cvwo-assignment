@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nutabi/cvwo-assignment/backend/internal/middleware"
-	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
@@ -48,16 +46,8 @@ func handleListTopics(svc service.Service) gin.HandlerFunc {
 func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user, exists := c.Get(middleware.UserIdentityKey)
-		if !exists {
-			respondWithError(c, http.StatusUnauthorized, "unauthorized")
-			return
-		}
-
-		// Gracefully type assert the user
-		userObj, ok := user.(*model.User)
-		if !ok {
-			respondWithError(c, http.StatusInternalServerError, "failed to retrieve user from context")
+		user := retrieveUser(c)
+		if user == nil {
 			return
 		}
 
@@ -74,7 +64,7 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 		// Delegate to service layer to create topic
 		topic, err := svc.CreateTopic(
 			c.Request.Context(),
-			userObj,
+			user,
 			req.Title,
 			req.Description,
 		)
@@ -117,16 +107,8 @@ func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user, exists := c.Get(middleware.UserIdentityKey)
-		if !exists {
-			respondWithError(c, http.StatusUnauthorized, "unauthorized")
-			return
-		}
-
-		// Gracefully type assert the user
-		userObj, ok := user.(*model.User)
-		if !ok {
-			respondWithError(c, http.StatusInternalServerError, "failed to retrieve user from context")
+		user := retrieveUser(c)
+		if user == nil {
 			return
 		}
 
@@ -151,7 +133,7 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 		if err := svc.UpdateTopic(
 			c.Request.Context(),
 			topicId,
-			userObj.ID,
+			user.ID,
 			req.Title,
 			req.Description,
 		); err != nil {
@@ -168,16 +150,8 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 func handleDeleteTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
-		user, exists := c.Get(middleware.UserIdentityKey)
-		if !exists {
-			respondWithError(c, http.StatusUnauthorized, "unauthorized")
-			return
-		}
-
-		// Gracefully type assert the user
-		userObj, ok := user.(*model.User)
-		if !ok {
-			respondWithError(c, http.StatusInternalServerError, "failed to retrieve user from context")
+		user := retrieveUser(c)
+		if user == nil {
 			return
 		}
 
@@ -192,7 +166,7 @@ func handleDeleteTopic(svc service.Service) gin.HandlerFunc {
 		if err := svc.DeleteTopic(
 			c.Request.Context(),
 			topicId,
-			userObj.ID,
+			user.ID,
 		); err != nil {
 			handleServiceError(c, err)
 			return
