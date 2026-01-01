@@ -33,3 +33,6 @@ godeps/
 # OS-generated files
 .DS_Store
 .Thumbs.db
+
+# Agent instruction files
+.github/copilot-instructions.md
