@@ -102,7 +102,7 @@ func TestCreatePost(t *testing.T) {
 				"title": "Post in Nonexistent Topic",
 			},
 			useAuth:        true,
-			expectedStatus: http.StatusCreated,
+			expectedStatus: http.StatusNotFound,
 			checkResponse:  nil,
 		},
 	}

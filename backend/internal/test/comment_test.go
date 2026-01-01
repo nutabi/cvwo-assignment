@@ -109,7 +109,7 @@ func TestCreateComment(t *testing.T) {
 				"content": "Comment on nonexistent post",
 			},
 			useAuth:        true,
-			expectedStatus: http.StatusCreated,
+			expectedStatus: http.StatusNotFound,
 			checkResponse:  nil,
 		},
 	}
