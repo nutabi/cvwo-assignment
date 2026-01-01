@@ -33,4 +33,12 @@ type Repository interface {
 	GetPosts(ctx context.Context, limit, offset int, topicID *uint, userID *uint) ([]model.Post, error)
 	UpdatePost(ctx context.Context, postID uint, title string, content *string) error
 	DeletePost(ctx context.Context, postID uint) error
+
+	// Comment-related repository methods
+
+	CreateComment(ctx context.Context, comment *model.Comment) error
+	GetOneComment(ctx context.Context, id uint) (*model.Comment, error)
+	GetComments(ctx context.Context, limit, offset int, postID *uint, userID *uint) ([]model.Comment, error)
+	UpdateComment(ctx context.Context, commentID uint, content string) error
+	DeleteComment(ctx context.Context, commentID uint) error
 }
