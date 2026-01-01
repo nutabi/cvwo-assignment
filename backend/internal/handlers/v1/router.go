@@ -25,7 +25,7 @@ func RegisterRoutes(
 	r.GET("/topics/:topic_id", handleGetTopicInfo(service))
 
 	// Add post public routes
-	r.GET("/topics/:topic_id/posts", handleListPosts(service))
+	r.GET("/posts", handleListPosts(service))
 	r.GET("/posts/:post_id", handleGetPostInfo(service))
 
 	protected := r.Group("", authMiddleware.MiddlewareFunc())

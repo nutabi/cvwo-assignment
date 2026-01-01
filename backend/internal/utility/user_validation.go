@@ -162,13 +162,3 @@ func ValidateEmail(email string) bool {
 	_, err := mail.ParseAddress(email)
 	return err == nil
 }
-
-// Validate avatar URL (stub function, always returns true)
-func ValidateAvatarUrl(avatarUrl string) bool {
-	return true
-}
-
-// Validate bio (stub function, always returns true)
-func ValidateBio(bio string) bool {
-	return true
-}

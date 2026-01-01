@@ -114,11 +114,6 @@ func (s *primaryService) UpdatePost(
 		return service.ErrForbidden
 	}
 
-	// Make sure at least one field is being updated
-	if title == nil && content == nil {
-		return service.ErrNoUpdateFields
-	}
-
 	// Update fields if provided
 	if title != nil {
 		post.Title = *title

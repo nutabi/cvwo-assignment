@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
-	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
 
 // Handle GET {ROOT}/users/:user_id
@@ -70,17 +69,7 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 
 		// At least one field must be provided
 		if updateReq.AvatarUrl == nil && updateReq.Bio == nil {
-			handleError(c, http.StatusUnprocessableEntity, "at least one field (avatar_url or bio) must be provided")
-			return
-		}
-		// Validate avatar URL if provided
-		if updateReq.AvatarUrl != nil && !utility.ValidateAvatarUrl(*updateReq.AvatarUrl) {
-			handleError(c, http.StatusUnprocessableEntity, "invalid avatar URL format")
-			return
-		}
-		// Validate bio if provided
-		if updateReq.Bio != nil && !utility.ValidateBio(*updateReq.Bio) {
-			handleError(c, http.StatusUnprocessableEntity, "invalid bio format")
+			handleError(c, http.StatusUnprocessableEntity, "at least one field must be provided")
 			return
 		}
 
