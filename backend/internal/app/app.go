@@ -18,6 +18,8 @@ type App struct {
 	serverAddress  string
 	service        service.Service
 	authMiddleware *gin_jwt.GinJWTMiddleware
+	isDebug        bool
+	corsOrigins    []string
 }
 
 func Initialise(cfg config.Config) App {
@@ -62,6 +64,8 @@ func Initialise(cfg config.Config) App {
 		serverAddress:  cfg.GetServerAddress(),
 		service:        svc,
 		authMiddleware: auth,
+		isDebug:        cfg.IsDebug(),
+		corsOrigins:    cfg.GetCORSOrigins(),
 	}
 }
 
@@ -72,6 +76,9 @@ func (a *App) Start() {
 	// Add logger and recovery middleware
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+
+	// Add CORS middleware
+	r.Use(middleware.NewCORSConfig(a.isDebug, a.corsOrigins))
 
 	// Add routes
 	v1.RegisterRoutes(r.Group("/v1"), a.service, a.authMiddleware)
