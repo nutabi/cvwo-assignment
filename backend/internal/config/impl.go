@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -15,6 +16,7 @@ type config struct {
 	databaseUrl    string
 	jwtSecret      string
 	debug          bool
+	corsOrigins    []string
 }
 
 // Return the application configuration.
@@ -51,12 +53,24 @@ func LoadConfig() (Config, error) {
 		}
 	}
 
+	// Parse CORS origins (comma-separated, optional)
+	corsOriginsStr := os.Getenv("CORS_ALLOWED_ORIGINS")
+	var corsOrigins []string
+	if corsOriginsStr != "" {
+		for _, origin := range strings.Split(corsOriginsStr, ",") {
+			if trimmed := strings.TrimSpace(origin); trimmed != "" {
+				corsOrigins = append(corsOrigins, trimmed)
+			}
+		}
+	}
+
 	cfg := config{
 		serverHostname: getRequired("SERVER_HOSTNAME"),
 		serverPort:     getRequiredInt("SERVER_PORT"),
 		databaseUrl:    getRequired("DATABASE_URL"),
 		jwtSecret:      getRequired("JWT_SECRET"),
 		debug:          getRequired("DEBUG") == "true",
+		corsOrigins:    corsOrigins,
 	}
 
 	if isBad {
@@ -88,4 +102,8 @@ func (c *config) IsDebug() bool {
 
 func (c *config) GetJWTSecretKey() string {
 	return c.jwtSecret
+}
+
+func (c *config) GetCORSOrigins() []string {
+	return c.corsOrigins
 }

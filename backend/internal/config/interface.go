@@ -19,4 +19,7 @@ type Config interface {
 
 	// Get JWT secret key for authentication.
 	GetJWTSecretKey() string
+
+	// Get allowed CORS origins for production.
+	GetCORSOrigins() []string
 }
