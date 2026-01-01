@@ -17,6 +17,16 @@ func (s *primaryService) CreatePost(
 	title string,
 	content *string,
 ) (*service.PostInfo, error) {
+	// Check if topic exists
+	topicExists, err := s.repo.CheckTopicExists(ctx, topicID)
+	if err != nil {
+		slog.Error("failed to check topic existence", "topic_id", topicID, "error", err)
+		return nil, errors.Join(service.ErrDatabaseError, err)
+	}
+	if !topicExists {
+		slog.Warn("topic not found for creating post", "topic_id", topicID)
+		return nil, service.ErrTopicNotFound
+	}
 	// Create new post model
 	newPost := model.Post{
 		Title:    title,

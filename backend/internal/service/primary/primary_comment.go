@@ -16,6 +16,17 @@ func (s *primaryService) CreateComment(
 	postID uint,
 	content string,
 ) (*service.CommentInfo, error) {
+	// Check if post exists
+	postExists, err := s.repo.CheckPostExists(ctx, postID)
+	if err != nil {
+		slog.Error("failed to check post existence", "post_id", postID, "error", err)
+		return nil, errors.Join(service.ErrDatabaseError, err)
+	}
+	if !postExists {
+		slog.Warn("post not found for creating comment", "post_id", postID)
+		return nil, service.ErrPostNotFound
+	}
+
 	// Create new comment model
 	newComment := model.Comment{
 		Content:  content,
