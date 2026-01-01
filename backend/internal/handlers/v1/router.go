@@ -28,6 +28,10 @@ func RegisterRoutes(
 	r.GET("/posts", handleListPosts(service))
 	r.GET("/posts/:post_id", handleGetPostInfo(service))
 
+	// Add comment public routes
+	r.GET("/posts/:post_id/comments", handleListComments(service))
+	r.GET("/comments/:comment_id", handleGetCommentInfo(service))
+
 	protected := r.Group("", authMiddleware.MiddlewareFunc())
 
 	// Add user protected routes
@@ -43,4 +47,9 @@ func RegisterRoutes(
 	protected.POST("/topics/:topic_id/posts", handleCreatePost(service))
 	protected.PATCH("/posts/:post_id", handleUpdatePost(service))
 	protected.DELETE("/posts/:post_id", handleDeletePost(service))
+
+	// Add comment protected routes
+	protected.POST("/posts/:post_id/comments", handleCreateComment(service))
+	protected.PATCH("/comments/:comment_id", handleUpdateComment(service))
+	protected.DELETE("/comments/:comment_id", handleDeleteComment(service))
 }
