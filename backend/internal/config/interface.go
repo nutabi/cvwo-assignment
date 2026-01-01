@@ -1,5 +1,7 @@
 package config
 
+import "log/slog"
+
 // Config interface defines methods to access configuration settings
 type Config interface {
 	// Get server hostname, like localhost or example.com.
@@ -22,4 +24,11 @@ type Config interface {
 
 	// Get allowed CORS origins for production.
 	GetCORSOrigins() []string
+
+	// Get log level for structured logging.
+	GetLogLevel() slog.Level
+
+	// Get log destination path. Empty string means stdout.
+	// Ignored in debug mode (always logs to console).
+	GetLogDestination() string
 }

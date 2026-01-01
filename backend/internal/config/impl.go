@@ -17,6 +17,8 @@ type config struct {
 	jwtSecret      string
 	debug          bool
 	corsOrigins    []string
+	logLevel       slog.Level
+	logDestination string
 }
 
 // Return the application configuration.
@@ -64,6 +66,24 @@ func LoadConfig() (Config, error) {
 		}
 	}
 
+	// Parse log level (optional, defaults to INFO)
+	logLevel := slog.LevelInfo
+	logLevelStr := strings.ToUpper(os.Getenv("LOG_LEVEL"))
+	switch logLevelStr {
+	case "DEBUG":
+		logLevel = slog.LevelDebug
+	case "INFO":
+		logLevel = slog.LevelInfo
+	case "WARN", "WARNING":
+		logLevel = slog.LevelWarn
+	case "ERROR":
+		logLevel = slog.LevelError
+	}
+
+	// Parse log destination (optional, defaults to stdout)
+	// Ignored in debug mode
+	logDestination := os.Getenv("LOG_DESTINATION")
+
 	cfg := config{
 		serverHostname: getRequired("SERVER_HOSTNAME"),
 		serverPort:     getRequiredInt("SERVER_PORT"),
@@ -71,6 +91,8 @@ func LoadConfig() (Config, error) {
 		jwtSecret:      getRequired("JWT_SECRET"),
 		debug:          getRequired("DEBUG") == "true",
 		corsOrigins:    corsOrigins,
+		logLevel:       logLevel,
+		logDestination: logDestination,
 	}
 
 	if isBad {
@@ -106,4 +128,12 @@ func (c *config) GetJWTSecretKey() string {
 
 func (c *config) GetCORSOrigins() []string {
 	return c.corsOrigins
+}
+
+func (c *config) GetLogLevel() slog.Level {
+	return c.logLevel
+}
+
+func (c *config) GetLogDestination() string {
+	return c.logDestination
 }
