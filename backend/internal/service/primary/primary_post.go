@@ -100,7 +100,7 @@ func (s *primaryService) FetchPostByID(
 	// Fetch post from repository
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("post not found", "post_id", postID)
 			return nil, service.ErrPostNotFound
 		}
@@ -125,7 +125,7 @@ func (s *primaryService) UpdatePost(
 	// Fetch existing post
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("post not found for update", "post_id", postID)
 			return service.ErrPostNotFound
 		}
@@ -171,7 +171,7 @@ func (s *primaryService) DeletePost(
 	// Fetch existing post
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("post not found for delete", "post_id", postID)
 			return service.ErrPostNotFound
 		}

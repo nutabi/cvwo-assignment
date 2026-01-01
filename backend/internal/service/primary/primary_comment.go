@@ -98,7 +98,7 @@ func (s *primaryService) FetchCommentByID(
 	// Fetch comment from repository
 	comment, err := s.repo.GetOneComment(ctx, commentID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("comment not found", "comment_id", commentID)
 			return nil, service.ErrCommentNotFound
 		}
@@ -122,7 +122,7 @@ func (s *primaryService) UpdateComment(
 	// Fetch comment from repository
 	comment, err := s.repo.GetOneComment(ctx, commentID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("comment not found for update", "comment_id", commentID)
 			return service.ErrCommentNotFound
 		}
@@ -155,7 +155,7 @@ func (s *primaryService) DeleteComment(
 	// Fetch comment from repository
 	comment, err := s.repo.GetOneComment(ctx, commentID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("comment not found for delete", "comment_id", commentID)
 			return service.ErrCommentNotFound
 		}

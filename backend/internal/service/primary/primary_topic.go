@@ -50,7 +50,7 @@ func (s *primaryService) FetchTopicByID(
 	// Fetch topic from repository
 	topic, err := s.repo.GetOneTopic(ctx, topicID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("topic not found", "topic_id", topicID)
 			return nil, service.ErrTopicNotFound
 		}
@@ -104,7 +104,7 @@ func (s *primaryService) UpdateTopic(
 	// Fetch topic from repository
 	topic, err := s.repo.GetOneTopic(ctx, topicID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("topic not found for update", "topic_id", topicID)
 			return service.ErrTopicNotFound
 		}
@@ -150,7 +150,7 @@ func (s *primaryService) DeleteTopic(
 	// Fetch topic from repository
 	topic, err := s.repo.GetOneTopic(ctx, topicID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("topic not found for delete", "topic_id", topicID)
 			return service.ErrTopicNotFound
 		}

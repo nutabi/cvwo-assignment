@@ -66,7 +66,7 @@ func (s *primaryService) FetchUserByID(ctx context.Context, id uint) (*service.U
 	// Fetch user from repository
 	user, err := s.repo.GetUserByID(ctx, id)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			slog.Warn("user not found", "user_id", id)
 			return nil, service.ErrUserNotFound
 		}
