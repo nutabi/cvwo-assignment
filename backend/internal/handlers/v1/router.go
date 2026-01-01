@@ -29,7 +29,7 @@ func RegisterRoutes(
 	r.GET("/posts/:post_id", handleGetPostInfo(service))
 
 	// Add comment public routes
-	r.GET("/posts/:post_id/comments", handleListComments(service))
+	r.GET("/comments", handleListComments(service))
 	r.GET("/comments/:comment_id", handleGetCommentInfo(service))
 
 	protected := r.Group("", authMiddleware.MiddlewareFunc())
