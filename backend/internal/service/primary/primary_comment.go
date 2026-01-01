@@ -24,13 +24,13 @@ func (s *primaryService) CreateComment(
 
 	// Save new comment via repository
 	if err := s.repo.CreateComment(ctx, &newComment); err != nil {
-		return nil, service.ErrDatabaseError
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Fetch the created comment with Author preloaded
 	comment, err := s.repo.GetOneComment(ctx, newComment.ID)
 	if err != nil {
-		return nil, service.ErrDatabaseError
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Return the newly created comment's info
@@ -60,7 +60,7 @@ func (s *primaryService) FetchComments(
 	// Fetch comments from repository
 	comments, err := s.repo.GetComments(ctx, limit, offset, postIDPtr, userIDPtr)
 	if err != nil {
-		return nil, service.ErrDatabaseError
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Convert to CommentInfo slice
@@ -82,7 +82,7 @@ func (s *primaryService) FetchCommentByID(
 		if err == gorm.ErrRecordNotFound {
 			return nil, service.ErrCommentNotFound
 		}
-		return nil, service.ErrDatabaseError
+		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Convert to CommentInfo
