@@ -39,7 +39,7 @@ func Initialise(cfg config.Config) App {
 	if !cfg.IsDebug() && cfg.GetLogRoot() != "" {
 		file, err := os.OpenFile(cfg.GetLogRoot(), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 		if err != nil {
-			slog.Error("Failed to open log file, falling back to stdout", "path", cfg.GetLogRoot(), "error", err)
+			slog.Warn("Failed to open log file, falling back to stdout", "path", cfg.GetLogRoot(), "error", err)
 		} else {
 			logWriter = file
 			logFile = file
@@ -72,12 +72,14 @@ func Initialise(cfg config.Config) App {
 	repo, err := sql.Connect(sqlite.Open(cfg.GetDSN()))
 	if err != nil {
 		slog.Error("Failed to connect to database", "error", err)
+		panic(err)
 	}
 
 	// Run migrations
 	err = repo.Migrate()
 	if err != nil {
 		slog.Error("Failed to run migrations", "error", err)
+		panic(err)
 	}
 
 	// Initialise service layer
