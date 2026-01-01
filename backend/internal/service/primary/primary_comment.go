@@ -83,9 +83,9 @@ func (s *primaryService) FetchComments(
 	slog.Debug("fetched comments", "count", len(comments), "limit", limit, "offset", offset)
 
 	// Convert to CommentInfo slice
-	var commentInfos []*service.CommentInfo
-	for _, comment := range comments {
-		commentInfos = append(commentInfos, service.InfoFromComment(&comment))
+	commentInfos := make([]*service.CommentInfo, len(comments))
+	for i, comment := range comments {
+		commentInfos[i] = service.InfoFromComment(&comment)
 	}
 
 	return commentInfos, nil
