@@ -39,6 +39,6 @@ type Service interface {
 	CreateComment(ctx context.Context, userID uint, postID uint, content string) (*CommentInfo, error)
 	FetchComments(ctx context.Context, limit, offset int, postID, userID uint) ([]*CommentInfo, error)
 	FetchCommentByID(ctx context.Context, commentID uint) (*CommentInfo, error)
-	UpdateComment(ctx context.Context, commentID, userID uint, content *string) error
+	UpdateComment(ctx context.Context, commentID, userID uint, content string) error
 	DeleteComment(ctx context.Context, commentID, userID uint) error
 }

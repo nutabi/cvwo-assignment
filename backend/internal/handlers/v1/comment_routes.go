@@ -112,7 +112,7 @@ func handleUpdateComment(svc service.Service) gin.HandlerFunc {
 
 		// Make sure at least one field is being updated
 		if req.Content == nil {
-			handleError(c, http.StatusUnprocessableEntity, "at least one field must be provided")
+			handleError(c, http.StatusUnprocessableEntity, "content must be provided")
 			return
 		}
 
@@ -121,7 +121,7 @@ func handleUpdateComment(svc service.Service) gin.HandlerFunc {
 			c.Request.Context(),
 			user.ID,
 			commentID,
-			req.Content,
+			*req.Content,
 		)
 		if err != nil {
 			handleServiceError(c, err)
