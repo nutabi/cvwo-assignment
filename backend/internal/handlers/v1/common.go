@@ -37,6 +37,8 @@ func handleServiceError(c *gin.Context, err error) {
 			handleError(c, http.StatusConflict, err.Error())
 		} else if errors.Is(err, service.ErrTopicNotFound) {
 			handleError(c, http.StatusNotFound, err.Error())
+		} else if errors.Is(err, service.ErrPostNotFound) {
+			handleError(c, http.StatusNotFound, err.Error())
 		} else if errors.Is(err, service.ErrForbidden) {
 			handleError(c, http.StatusForbidden, err.Error())
 		} else if errors.Is(err, service.ErrNoUpdateFields) {
