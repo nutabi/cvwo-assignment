@@ -73,6 +73,21 @@ func NewAuthConfig(
 			}
 			return jwt.MapClaims{}
 		},
+		IdentityHandler: func(ctx *gin.Context) any {
+			claims := gin_jwt.ExtractClaims(ctx)
+			userIDFloat, ok := claims[UserIdentityKey].(float64)
+			if !ok {
+				return nil
+			}
+			userID := uint(userIDFloat)
+
+			// Fetch user from repository
+			user, err := repo.GetUserByID(ctx.Request.Context(), userID)
+			if err != nil {
+				return nil
+			}
+			return user
+		},
 		IdentityKey:    UserIdentityKey,
 		TokenLookup:    "header:Authorization,cookie:jwt",
 		SendCookie:     true,
