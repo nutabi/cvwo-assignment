@@ -29,7 +29,9 @@ func handleInternalError(c *gin.Context) {
 // Responds with appropriate HTTP status codes based on the provided service error.
 func handleServiceError(c *gin.Context, err error) {
 	if err != nil {
-		if errors.Is(err, service.ErrUserNotFound) {
+		if errors.Is(err, service.ErrCommentNotFound) {
+			handleError(c, http.StatusNotFound, err.Error())
+		} else if errors.Is(err, service.ErrUserNotFound) {
 			handleError(c, http.StatusNotFound, err.Error())
 		} else if errors.Is(err, service.ErrUsernameTaken) {
 			handleError(c, http.StatusConflict, err.Error())

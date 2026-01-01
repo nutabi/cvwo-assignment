@@ -5,6 +5,9 @@ import (
 )
 
 var (
+	// Comment not found error
+	ErrCommentNotFound = errors.New("comment not found")
+
 	// Cryptographic errors
 	ErrCryptoError = errors.New("cryptographic error")
 
