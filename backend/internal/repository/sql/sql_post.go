@@ -63,6 +63,21 @@ func (r *sqlRepository) GetPosts(
 	return posts, nil
 }
 
+func (r *sqlRepository) CheckPostExists(
+	ctx context.Context,
+	id uint,
+) (bool, error) {
+	slog.Debug("checking post existence", "post_id", id)
+	count, err := gorm.
+		G[model.Post](r.db).
+		Where("id = ?", id).
+		Count(ctx, "id")
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r *sqlRepository) UpdatePost(
 	ctx context.Context,
 	postID uint,
