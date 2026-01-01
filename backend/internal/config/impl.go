@@ -18,7 +18,7 @@ type config struct {
 	debug          bool
 	corsOrigins    []string
 	logLevel       slog.Level
-	logDestination string
+	logRoot        string
 }
 
 // Return the application configuration.
@@ -66,33 +66,39 @@ func LoadConfig() (Config, error) {
 		}
 	}
 
-	// Parse log level (optional, defaults to INFO)
-	logLevel := slog.LevelInfo
-	logLevelStr := strings.ToUpper(os.Getenv("LOG_LEVEL"))
-	switch logLevelStr {
-	case "DEBUG":
+	// Parse log level (optional, defaults to WARN)
+	// In debug mode, always use DEBUG level
+	logLevel := slog.LevelWarn
+	isDebug := getRequired("DEBUG") == "true"
+	if isDebug {
 		logLevel = slog.LevelDebug
-	case "INFO":
-		logLevel = slog.LevelInfo
-	case "WARN", "WARNING":
-		logLevel = slog.LevelWarn
-	case "ERROR":
-		logLevel = slog.LevelError
+	} else {
+		logLevelStr := strings.ToUpper(os.Getenv("LOG_LEVEL"))
+		switch logLevelStr {
+		case "DEBUG":
+			logLevel = slog.LevelDebug
+		case "INFO":
+			logLevel = slog.LevelInfo
+		case "WARN", "WARNING":
+			logLevel = slog.LevelWarn
+		case "ERROR":
+			logLevel = slog.LevelError
+		}
 	}
 
-	// Parse log destination (optional, defaults to stdout)
+	// Parse log root (optional, defaults to stdout)
 	// Ignored in debug mode
-	logDestination := os.Getenv("LOG_DESTINATION")
+	logRoot := os.Getenv("LOG_ROOT")
 
 	cfg := config{
 		serverHostname: getRequired("SERVER_HOSTNAME"),
 		serverPort:     getRequiredInt("SERVER_PORT"),
 		databaseUrl:    getRequired("DATABASE_URL"),
 		jwtSecret:      getRequired("JWT_SECRET"),
-		debug:          getRequired("DEBUG") == "true",
+		debug:          isDebug,
 		corsOrigins:    corsOrigins,
 		logLevel:       logLevel,
-		logDestination: logDestination,
+		logRoot:        logRoot,
 	}
 
 	if isBad {
@@ -134,6 +140,6 @@ func (c *config) GetLogLevel() slog.Level {
 	return c.logLevel
 }
 
-func (c *config) GetLogDestination() string {
-	return c.logDestination
+func (c *config) GetLogRoot() string {
+	return c.logRoot
 }
