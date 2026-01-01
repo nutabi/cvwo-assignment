@@ -119,8 +119,8 @@ func handleUpdateComment(svc service.Service) gin.HandlerFunc {
 		// Delegate to service layer to update comment
 		err := svc.UpdateComment(
 			c.Request.Context(),
-			user.ID,
 			commentID,
+			user.ID,
 			*req.Content,
 		)
 		if err != nil {
