@@ -70,25 +70,25 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 
 // Handle GET {ROOT}/topics/:topic_id
 func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+	return func(c *gin.Context) {
 		// Parse topic ID from path
-		topicID, ok := mustGetIDParam(ctx, "topic_id")
+		topicID, ok := mustGetIDParam(c, "topic_id")
 		if !ok {
 			return
 		}
 
 		// Delegate to service layer to get topic details
 		topic, err := svc.FetchTopicByID(
-			ctx.Request.Context(),
+			c.Request.Context(),
 			topicID,
 		)
 		if err != nil {
-			handleServiceError(ctx, err)
+			handleServiceError(c, err)
 			return
 		}
 
 		// Respond with topic details
-		ctx.JSON(http.StatusOK, topic)
+		c.JSON(http.StatusOK, topic)
 	}
 }
 
