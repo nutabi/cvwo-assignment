@@ -61,6 +61,22 @@ var mockPosts []struct {
 	{"Another General Post", "More general discussion", 2, 1},
 }
 
+var mockComments []struct {
+	content  string
+	authorID uint
+	postID   uint
+} = []struct {
+	content  string
+	authorID uint
+	postID   uint
+}{
+	{"Great post!", 2, 1},
+	{"I totally agree with this!", 3, 1},
+	{"Interesting perspective", 1, 2},
+	{"Thanks for sharing!", 2, 2},
+	{"This is helpful", 3, 3},
+}
+
 func initRepo() (repository.Repository, error) {
 	repo, err := sql.Connect(sqlite.Open(":memory:"))
 	if err != nil {
@@ -102,6 +118,15 @@ func addMockPost(repo repository.Repository, title, content string, authorID, to
 	return repo.CreatePost(context.Background(), post)
 }
 
+func addMockComment(repo repository.Repository, content string, authorID, postID uint) error {
+	comment := &model.Comment{
+		Content:  content,
+		AuthorID: authorID,
+		PostID:   postID,
+	}
+	return repo.CreateComment(context.Background(), comment)
+}
+
 func initRepoWithMockUsers() (repository.Repository, error) {
 	repo, err := initRepo()
 	if err != nil {
@@ -135,6 +160,19 @@ func initRepoWithMockUsersTopicsAndPosts() (repository.Repository, error) {
 	}
 	for _, mp := range mockPosts {
 		if err := addMockPost(repo, mp.title, mp.content, mp.authorID, mp.topicID); err != nil {
+			return nil, err
+		}
+	}
+	return repo, nil
+}
+
+func initRepoWithMockUsersTopicsPostsAndComments() (repository.Repository, error) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		return nil, err
+	}
+	for _, mc := range mockComments {
+		if err := addMockComment(repo, mc.content, mc.authorID, mc.postID); err != nil {
 			return nil, err
 		}
 	}
@@ -997,5 +1035,318 @@ func TestDeletePost_NotFound(t *testing.T) {
 	// This test verifies that deleting a non-existent post doesn't cause a panic
 	if err != nil {
 		t.Errorf("Unexpected error when deleting non-existent post: %v", err)
+	}
+}
+
+// Comment-related tests
+
+func TestCreateComment(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsAndPosts()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+	for i, mc := range mockComments {
+		t.Run("comment_"+string(rune(i+1)), func(t *testing.T) {
+			if err := repo.CreateComment(context.Background(), &model.Comment{
+				Content:  mc.content,
+				AuthorID: mc.authorID,
+				PostID:   mc.postID,
+			}); err != nil {
+				t.Errorf("Failed to create comment: %v", err)
+			}
+		})
+	}
+}
+
+func TestGetOneComment(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+	for i, mc := range mockComments {
+		t.Run("comment_"+string(rune(i+1)), func(t *testing.T) {
+			comment, err := repo.GetOneComment(context.Background(), uint(i+1))
+			if err != nil {
+				t.Errorf("Failed to get comment by ID: %v", err)
+			}
+			if comment.Content != mc.content {
+				t.Errorf("Retrieved comment content does not match. Got %s, want %s", comment.Content, mc.content)
+			}
+			if comment.AuthorID != mc.authorID {
+				t.Errorf("Retrieved comment authorID does not match. Got %d, want %d", comment.AuthorID, mc.authorID)
+			}
+			if comment.PostID != mc.postID {
+				t.Errorf("Retrieved comment postID does not match. Got %d, want %d", comment.PostID, mc.postID)
+			}
+			// Verify Author is preloaded
+			if comment.Author == nil {
+				t.Error("Expected Author to be preloaded, got nil")
+			} else if comment.Author.ID != mc.authorID {
+				t.Errorf("Expected Author ID %d, got %d", mc.authorID, comment.Author.ID)
+			}
+		})
+	}
+}
+
+func TestGetOneComment_NotFound(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Try to get non-existent comment
+	_, err = repo.GetOneComment(context.Background(), 9999)
+	if err == nil {
+		t.Error("Expected error when getting non-existent comment, got nil")
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Errorf("Expected gorm.ErrRecordNotFound, got %v", err)
+	}
+}
+
+func TestGetComments_NoFilters(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Get all comments without filters
+	comments, err := repo.GetComments(context.Background(), 10, 0, nil, nil)
+	if err != nil {
+		t.Fatalf("Failed to get comments: %v", err)
+	}
+
+	if len(comments) != len(mockComments) {
+		t.Errorf("Expected %d comments, got %d", len(mockComments), len(comments))
+	}
+
+	// Verify all comments have Author preloaded
+	for i, comment := range comments {
+		if comment.Author == nil {
+			t.Errorf("Comment %d: Expected Author to be preloaded, got nil", i)
+		}
+	}
+}
+
+func TestGetComments_FilterByPostID(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Count expected comments for post 1
+	expectedCount := 0
+	for _, mc := range mockComments {
+		if mc.postID == 1 {
+			expectedCount++
+		}
+	}
+
+	// Get comments for post 1
+	postID := uint(1)
+	comments, err := repo.GetComments(context.Background(), 10, 0, &postID, nil)
+	if err != nil {
+		t.Fatalf("Failed to get comments for post 1: %v", err)
+	}
+
+	if len(comments) != expectedCount {
+		t.Errorf("Expected %d comments for post 1, got %d", expectedCount, len(comments))
+	}
+
+	// Verify all comments belong to post 1
+	for _, comment := range comments {
+		if comment.PostID != 1 {
+			t.Errorf("Expected comment to belong to post 1, got post %d", comment.PostID)
+		}
+	}
+}
+
+func TestGetComments_FilterByUserID(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Count expected comments for user 2
+	expectedCount := 0
+	for _, mc := range mockComments {
+		if mc.authorID == 2 {
+			expectedCount++
+		}
+	}
+
+	// Get comments by user 2
+	userID := uint(2)
+	comments, err := repo.GetComments(context.Background(), 10, 0, nil, &userID)
+	if err != nil {
+		t.Fatalf("Failed to get comments by user 2: %v", err)
+	}
+
+	if len(comments) != expectedCount {
+		t.Errorf("Expected %d comments by user 2, got %d", expectedCount, len(comments))
+	}
+
+	// Verify all comments belong to user 2
+	for _, comment := range comments {
+		if comment.AuthorID != 2 {
+			t.Errorf("Expected comment to belong to user 2, got user %d", comment.AuthorID)
+		}
+	}
+}
+
+func TestGetComments_FilterByPostAndUser(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Count expected comments for post 2 by user 1
+	expectedCount := 0
+	for _, mc := range mockComments {
+		if mc.postID == 2 && mc.authorID == 1 {
+			expectedCount++
+		}
+	}
+
+	// Get comments for post 2 by user 1
+	postID := uint(2)
+	userID := uint(1)
+	comments, err := repo.GetComments(context.Background(), 10, 0, &postID, &userID)
+	if err != nil {
+		t.Fatalf("Failed to get comments for post 2 by user 1: %v", err)
+	}
+
+	if len(comments) != expectedCount {
+		t.Errorf("Expected %d comments for post 2 by user 1, got %d", expectedCount, len(comments))
+	}
+
+	// Verify all comments match filters
+	for _, comment := range comments {
+		if comment.PostID != 2 {
+			t.Errorf("Expected comment to belong to post 2, got post %d", comment.PostID)
+		}
+		if comment.AuthorID != 1 {
+			t.Errorf("Expected comment to belong to user 1, got user %d", comment.AuthorID)
+		}
+	}
+}
+
+func TestGetComments_WithPagination(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Get first 2 comments
+	comments, err := repo.GetComments(context.Background(), 2, 0, nil, nil)
+	if err != nil {
+		t.Fatalf("Failed to get first page of comments: %v", err)
+	}
+
+	if len(comments) != 2 {
+		t.Errorf("Expected 2 comments on first page, got %d", len(comments))
+	}
+
+	// Get next 2 comments
+	commentsPage2, err := repo.GetComments(context.Background(), 2, 2, nil, nil)
+	if err != nil {
+		t.Fatalf("Failed to get second page of comments: %v", err)
+	}
+
+	if len(commentsPage2) != 2 {
+		t.Errorf("Expected 2 comments on second page, got %d", len(commentsPage2))
+	}
+
+	// Verify pages don't overlap
+	if comments[0].ID == commentsPage2[0].ID {
+		t.Error("Expected different comments on different pages")
+	}
+}
+
+func TestUpdateComment(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Get comment with ID 1
+	comment, err := repo.GetOneComment(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get comment: %v", err)
+	}
+
+	// Update comment content
+	newContent := "Updated comment content"
+	if err := repo.UpdateComment(context.Background(), comment.ID, newContent); err != nil {
+		t.Fatalf("Failed to update comment: %v", err)
+	}
+
+	// Verify update
+	updatedComment, err := repo.GetOneComment(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get updated comment: %v", err)
+	}
+
+	if updatedComment.Content != newContent {
+		t.Errorf("Expected content %s, got %s", newContent, updatedComment.Content)
+	}
+}
+
+func TestUpdateComment_NotFound(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Try to update non-existent comment
+	err = repo.UpdateComment(context.Background(), 9999, "New content")
+	// Since the implementation doesn't check if comment exists before updating,
+	// this won't return an error. The update will just affect 0 rows.
+	// This test verifies that updating a non-existent comment doesn't cause a panic
+	if err != nil {
+		t.Errorf("Unexpected error when updating non-existent comment: %v", err)
+	}
+}
+
+func TestDeleteComment(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Get comment with ID 1
+	comment, err := repo.GetOneComment(context.Background(), 1)
+	if err != nil {
+		t.Fatalf("Failed to get comment: %v", err)
+	}
+
+	// Delete comment
+	if err := repo.DeleteComment(context.Background(), comment.ID); err != nil {
+		t.Fatalf("Failed to delete comment: %v", err)
+	}
+
+	// Verify comment is deleted
+	_, err = repo.GetOneComment(context.Background(), 1)
+	if err == nil {
+		t.Error("Expected error when getting deleted comment, got nil")
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Errorf("Expected gorm.ErrRecordNotFound, got %v", err)
+	}
+}
+
+func TestDeleteComment_NotFound(t *testing.T) {
+	repo, err := initRepoWithMockUsersTopicsPostsAndComments()
+	if err != nil {
+		t.Fatalf("Failed to initialise repository: %v", err)
+	}
+
+	// Try to delete non-existent comment
+	err = repo.DeleteComment(context.Background(), 9999)
+	// Since the implementation doesn't check if comment exists before deleting,
+	// this won't return an error. The delete will just affect 0 rows.
+	// This test verifies that deleting a non-existent comment doesn't cause a panic
+	if err != nil {
+		t.Errorf("Unexpected error when deleting non-existent comment: %v", err)
 	}
 }

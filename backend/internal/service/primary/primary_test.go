@@ -419,6 +419,21 @@ func createTestPost(id uint, title string, content *string, authorID, topicID ui
 	}
 }
 
+// Helper function to create a test comment
+func createTestComment(id uint, content string, authorID, postID uint) *model.Comment {
+	now := time.Now()
+	return &model.Comment{
+		Model: gorm.Model{
+			ID:        id,
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
+		Content:  content,
+		AuthorID: authorID,
+		PostID:   postID,
+	}
+}
+
 // Test CreateTopic
 func TestCreateTopic(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
@@ -1403,6 +1418,503 @@ func TestDeletePost(t *testing.T) {
 
 		// Execute (author2 trying to delete author1's post)
 		err = svc.DeletePost(ctx, 1, 2)
+
+		// Assert
+		if err == nil {
+			t.Fatal("Expected error, got nil")
+		}
+		if !errors.Is(err, service.ErrForbidden) {
+			t.Errorf("Expected ErrForbidden, got %v", err)
+		}
+	})
+}
+
+// Test CreateComment
+func TestCreateComment(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create author, topic, and post
+		author := createTestUser(1, "author", "author@example.com")
+		mockRepo.CreateUser(ctx, author)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		// Execute
+		commentInfo, err := svc.CreateComment(ctx, 1, 1, "This is a test comment")
+
+		// Assert
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if commentInfo == nil {
+			t.Fatal("Expected comment info, got nil")
+		}
+		if commentInfo.Content != "This is a test comment" {
+			t.Errorf("Expected content 'This is a test comment', got '%s'", commentInfo.Content)
+		}
+		if commentInfo.Author == nil {
+			t.Fatal("Expected author, got nil")
+		}
+		if commentInfo.Author.Username != "author" {
+			t.Errorf("Expected author username 'author', got '%s'", commentInfo.Author.Username)
+		}
+	})
+}
+
+// Test FetchCommentByID
+func TestFetchCommentByID(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create author, topic, post, and comment
+		author := createTestUser(1, "author", "author@example.com")
+		mockRepo.CreateUser(ctx, author)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		comment := createTestComment(1, "Test comment", 1, 1)
+		mockRepo.CreateComment(ctx, comment)
+
+		// Execute
+		commentInfo, err := svc.FetchCommentByID(ctx, 1)
+
+		// Assert
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if commentInfo == nil {
+			t.Fatal("Expected comment info, got nil")
+		}
+		if commentInfo.Content != "Test comment" {
+			t.Errorf("Expected content 'Test comment', got '%s'", commentInfo.Content)
+		}
+	})
+
+	t.Run("CommentNotFound", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Execute
+		commentInfo, err := svc.FetchCommentByID(ctx, 999)
+
+		// Assert
+		if err == nil {
+			t.Fatal("Expected error, got nil")
+		}
+		if !errors.Is(err, service.ErrCommentNotFound) {
+			t.Errorf("Expected ErrCommentNotFound, got %v", err)
+		}
+		if commentInfo != nil {
+			t.Errorf("Expected nil comment info, got %v", commentInfo)
+		}
+	})
+}
+
+// Test FetchComments
+func TestFetchComments(t *testing.T) {
+	t.Run("FetchAllComments", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create authors, topic, post, and comments
+		author1 := createTestUser(1, "author1", "author1@example.com")
+		author2 := createTestUser(2, "author2", "author2@example.com")
+		mockRepo.CreateUser(ctx, author1)
+		mockRepo.CreateUser(ctx, author2)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		comment1 := createTestComment(1, "Comment 1", 1, 1)
+		comment2 := createTestComment(2, "Comment 2", 2, 1)
+		mockRepo.CreateComment(ctx, comment1)
+		mockRepo.CreateComment(ctx, comment2)
+
+		// Execute
+		comments, err := svc.FetchComments(ctx, 10, 0, 0, 0)
+
+		// Assert
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if len(comments) != 2 {
+			t.Errorf("Expected 2 comments, got %d", len(comments))
+		}
+	})
+
+	t.Run("FilterByPostID", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create authors, topic, posts, and comments
+		author := createTestUser(1, "author", "author@example.com")
+		mockRepo.CreateUser(ctx, author)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content1 := "Test content 1"
+		content2 := "Test content 2"
+		post1 := createTestPost(1, "Test Post 1", &content1, 1, 1)
+		post2 := createTestPost(2, "Test Post 2", &content2, 1, 1)
+		mockRepo.CreatePost(ctx, post1)
+		mockRepo.CreatePost(ctx, post2)
+
+		comment1 := createTestComment(1, "Comment for post 1", 1, 1)
+		comment2 := createTestComment(2, "Another comment for post 1", 1, 1)
+		comment3 := createTestComment(3, "Comment for post 2", 1, 2)
+		mockRepo.CreateComment(ctx, comment1)
+		mockRepo.CreateComment(ctx, comment2)
+		mockRepo.CreateComment(ctx, comment3)
+
+		// Execute
+		comments, err := svc.FetchComments(ctx, 10, 0, 1, 0)
+
+		// Assert
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if len(comments) != 2 {
+			t.Errorf("Expected 2 comments for post 1, got %d", len(comments))
+		}
+	})
+
+	t.Run("FilterByUserID", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create authors, topic, post, and comments
+		author1 := createTestUser(1, "author1", "author1@example.com")
+		author2 := createTestUser(2, "author2", "author2@example.com")
+		mockRepo.CreateUser(ctx, author1)
+		mockRepo.CreateUser(ctx, author2)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		comment1 := createTestComment(1, "Comment by author 1", 1, 1)
+		comment2 := createTestComment(2, "Another comment by author 1", 1, 1)
+		comment3 := createTestComment(3, "Comment by author 2", 2, 1)
+		mockRepo.CreateComment(ctx, comment1)
+		mockRepo.CreateComment(ctx, comment2)
+		mockRepo.CreateComment(ctx, comment3)
+
+		// Execute
+		comments, err := svc.FetchComments(ctx, 10, 0, 0, 1)
+
+		// Assert
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+		if len(comments) != 2 {
+			t.Errorf("Expected 2 comments by author 1, got %d", len(comments))
+		}
+	})
+
+	t.Run("WithPagination", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create author, topic, post, and multiple comments
+		author := createTestUser(1, "author", "author@example.com")
+		mockRepo.CreateUser(ctx, author)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		for i := 1; i <= 5; i++ {
+			comment := createTestComment(uint(i), "Comment "+string(rune(i)), 1, 1)
+			mockRepo.CreateComment(ctx, comment)
+		}
+
+		// Execute - get first page
+		commentsPage1, err := svc.FetchComments(ctx, 2, 0, 0, 0)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		// Execute - get second page
+		commentsPage2, err := svc.FetchComments(ctx, 2, 2, 0, 0)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		// Assert
+		if len(commentsPage1) != 2 {
+			t.Errorf("Expected 2 comments on page 1, got %d", len(commentsPage1))
+		}
+		if len(commentsPage2) != 2 {
+			t.Errorf("Expected 2 comments on page 2, got %d", len(commentsPage2))
+		}
+		if commentsPage1[0].CommentID == commentsPage2[0].CommentID {
+			t.Error("Expected different comments on different pages")
+		}
+	})
+}
+
+// Test UpdateComment
+func TestUpdateComment(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create author, topic, post, and comment
+		author := createTestUser(1, "author", "author@example.com")
+		mockRepo.CreateUser(ctx, author)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		comment := createTestComment(1, "Original comment", 1, 1)
+		mockRepo.CreateComment(ctx, comment)
+
+		// Execute
+		err = svc.UpdateComment(ctx, 1, 1, "Updated comment")
+
+		// Assert
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		// Verify update
+		updatedComment, err := svc.FetchCommentByID(ctx, 1)
+		if err != nil {
+			t.Fatalf("Failed to fetch updated comment: %v", err)
+		}
+		if updatedComment.Content != "Updated comment" {
+			t.Errorf("Expected content 'Updated comment', got '%s'", updatedComment.Content)
+		}
+	})
+
+	t.Run("CommentNotFound", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Execute
+		err = svc.UpdateComment(ctx, 999, 1, "Updated comment")
+
+		// Assert
+		if err == nil {
+			t.Fatal("Expected error, got nil")
+		}
+		if !errors.Is(err, service.ErrCommentNotFound) {
+			t.Errorf("Expected ErrCommentNotFound, got %v", err)
+		}
+	})
+
+	t.Run("Forbidden", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create authors, topic, post, and comment
+		author1 := createTestUser(1, "author1", "author1@example.com")
+		author2 := createTestUser(2, "author2", "author2@example.com")
+		mockRepo.CreateUser(ctx, author1)
+		mockRepo.CreateUser(ctx, author2)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		comment := createTestComment(1, "Comment by author1", 1, 1)
+		mockRepo.CreateComment(ctx, comment)
+
+		// Execute (author2 trying to update author1's comment)
+		err = svc.UpdateComment(ctx, 1, 2, "Updated comment")
+
+		// Assert
+		if err == nil {
+			t.Fatal("Expected error, got nil")
+		}
+		if !errors.Is(err, service.ErrForbidden) {
+			t.Errorf("Expected ErrForbidden, got %v", err)
+		}
+	})
+}
+
+// Test DeleteComment
+func TestDeleteComment(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create author, topic, post, and comment
+		author := createTestUser(1, "author", "author@example.com")
+		mockRepo.CreateUser(ctx, author)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		comment := createTestComment(1, "Test comment", 1, 1)
+		mockRepo.CreateComment(ctx, comment)
+
+		// Execute
+		err = svc.DeleteComment(ctx, 1, 1)
+
+		// Assert
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		// Verify deletion
+		_, err = svc.FetchCommentByID(ctx, 1)
+		if err == nil {
+			t.Error("Expected error when fetching deleted comment, got nil")
+		}
+		if !errors.Is(err, service.ErrCommentNotFound) {
+			t.Errorf("Expected ErrCommentNotFound, got %v", err)
+		}
+	})
+
+	t.Run("CommentNotFound", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Execute
+		err = svc.DeleteComment(ctx, 999, 1)
+
+		// Assert
+		if err == nil {
+			t.Fatal("Expected error, got nil")
+		}
+		if !errors.Is(err, service.ErrCommentNotFound) {
+			t.Errorf("Expected ErrCommentNotFound, got %v", err)
+		}
+	})
+
+	t.Run("Forbidden", func(t *testing.T) {
+		// Setup
+		mockRepo, err := createMockRepository()
+		if err != nil {
+			t.Fatalf("Failed to create mock repository: %v", err)
+		}
+		svc := primary.NewService(mockRepo)
+		ctx := context.Background()
+
+		// Create authors, topic, post, and comment
+		author1 := createTestUser(1, "author1", "author1@example.com")
+		author2 := createTestUser(2, "author2", "author2@example.com")
+		mockRepo.CreateUser(ctx, author1)
+		mockRepo.CreateUser(ctx, author2)
+
+		desc := "Topic description"
+		topic := createTestTopic(1, "Test Topic", &desc, 1)
+		mockRepo.CreateTopic(ctx, topic)
+
+		content := "Test content"
+		post := createTestPost(1, "Test Post", &content, 1, 1)
+		mockRepo.CreatePost(ctx, post)
+
+		comment := createTestComment(1, "Comment by author1", 1, 1)
+		mockRepo.CreateComment(ctx, comment)
+
+		// Execute (author2 trying to delete author1's comment)
+		err = svc.DeleteComment(ctx, 1, 2)
 
 		// Assert
 		if err == nil {
