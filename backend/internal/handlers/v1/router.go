@@ -18,7 +18,7 @@ func RegisterRoutes(
 	r.POST("/auth/register", handleUserRegistration(service))
 
 	// Add user public routes
-	r.GET("/users/:user_id", handlerPublicUserProfile(service))
+	r.GET("/users/:user_id", handlePublicUserProfile(service))
 
 	// Add topic public routes
 	r.GET("/topics", handleListTopics(service))
@@ -32,7 +32,7 @@ func RegisterRoutes(
 
 	// Add user protected routes
 	protected.GET("/users/me", handleCurrentUserProfile(service))
-	protected.PUT("/users/me", handleUpdateUserProfile(service))
+	protected.PATCH("/users/me", handleUpdateUserProfile(service))
 
 	// Add topic protected routes
 	protected.POST("/topics", handleCreateTopic(service))

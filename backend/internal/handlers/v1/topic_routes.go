@@ -139,7 +139,7 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle DELETE {ROOT}/topics/:id
+// Handle DELETE {ROOT}/topics/:topic_id
 func handleDeleteTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context

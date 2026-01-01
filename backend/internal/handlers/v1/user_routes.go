@@ -8,7 +8,7 @@ import (
 )
 
 // Handle GET {ROOT}/users/:user_id
-func handlerPublicUserProfile(svc service.Service) gin.HandlerFunc {
+func handlePublicUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse user ID from path
 		userID, ok := mustGetIDParam(c, "user_id")
