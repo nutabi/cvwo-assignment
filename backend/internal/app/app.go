@@ -80,8 +80,12 @@ func (a *App) Start() {
 	// Add CORS middleware
 	r.Use(middleware.NewCORSConfig(a.isDebug, a.corsOrigins))
 
-	// Add routes
-	v1.RegisterRoutes(r.Group("/v1"), a.service, a.authMiddleware)
+	// Add general rate limiting middleware
+	r.Use(middleware.NewGeneralRateLimiter())
+
+	// Add routes with authentication rate limiter
+	authRateLimiter := middleware.NewAuthRateLimiter()
+	v1.RegisterRoutes(r.Group("/v1"), a.service, a.authMiddleware, authRateLimiter)
 
 	// Start listening
 	err := r.Run(a.serverAddress)

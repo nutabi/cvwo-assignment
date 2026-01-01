@@ -10,12 +10,17 @@ func RegisterRoutes(
 	r *gin.RouterGroup,
 	service service.Service,
 	authMiddleware *gin_jwt.GinJWTMiddleware,
+	authRateLimiter gin.HandlerFunc,
 ) {
-	// Add authentication routes
-	r.POST("/auth/login", authMiddleware.LoginHandler)
-	r.POST("/auth/logout", authMiddleware.LogoutHandler)
-	r.POST("/auth/refresh", authMiddleware.RefreshHandler)
-	r.POST("/auth/register", handleUserRegistration(service))
+	// Add authentication routes with rate limiting
+	authGroup := r.Group("/auth")
+	authGroup.Use(authRateLimiter)
+	{
+		authGroup.POST("/login", authMiddleware.LoginHandler)
+		authGroup.POST("/logout", authMiddleware.LogoutHandler)
+		authGroup.POST("/refresh", authMiddleware.RefreshHandler)
+		authGroup.POST("/register", handleUserRegistration(service))
+	}
 
 	// Add user public routes
 	r.GET("/users/:user_id", handlePublicUserProfile(service))

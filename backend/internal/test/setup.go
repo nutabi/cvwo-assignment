@@ -31,6 +31,9 @@ func setupTestRouter(t *testing.T) *gin.Engine {
 		t.Fatalf("Failed to initialise auth middleware: %v", err)
 	}
 
+	// Initialise rate limiter for auth endpoints
+	authRateLimiter := middleware.NewAuthRateLimiter()
+
 	// Initialise Gin router
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
@@ -38,6 +41,6 @@ func setupTestRouter(t *testing.T) *gin.Engine {
 	r.Use(gin.Recovery())
 
 	// Register routes
-	v1.RegisterRoutes(r.Group("/v1"), svc, auth)
+	v1.RegisterRoutes(r.Group("/v1"), svc, auth, authRateLimiter)
 	return r
 }
