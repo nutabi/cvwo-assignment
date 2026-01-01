@@ -63,12 +63,9 @@ func Initialise(cfg config.Config) App {
 	// Set as default logger
 	slog.SetDefault(slog.New(handler))
 
-	// Set Gin mode
-	if cfg.IsDebug() {
-		gin.SetMode(gin.DebugMode)
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-	}
+	// Set Gin to release mode to suppress route printing
+	// Application logging is controlled separately via slog
+	gin.SetMode(gin.ReleaseMode)
 
 	// Initialise repository
 	// Only supporting SQLite for now
