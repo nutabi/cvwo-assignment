@@ -2,18 +2,21 @@ package sql
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"gorm.io/gorm"
 )
 
 func (r *sqlRepository) CreatePost(ctx context.Context, post *model.Post) error {
+	slog.Debug("creating post", "topic_id", post.TopicID, "author_id", post.AuthorID)
 	return gorm.
 		G[model.Post](r.db).
 		Create(ctx, post)
 }
 
 func (r *sqlRepository) GetOnePost(ctx context.Context, id uint) (*model.Post, error) {
+	slog.Debug("fetching post by ID", "post_id", id)
 	post, err := gorm.
 		G[model.Post](r.db).
 		Preload("Author", nil).
@@ -32,6 +35,8 @@ func (r *sqlRepository) GetPosts(
 	topicID *uint,
 	userID *uint,
 ) ([]model.Post, error) {
+	slog.Debug("fetching posts", "limit", limit, "offset", offset)
+
 	// Base query
 	query := gorm.
 		G[model.Post](r.db).
@@ -64,6 +69,7 @@ func (r *sqlRepository) UpdatePost(
 	title string,
 	content *string,
 ) error {
+	slog.Debug("updating post", "post_id", postID)
 	_, err := gorm.
 		G[model.Post](r.db).
 		Where("id = ?", postID).
@@ -72,6 +78,7 @@ func (r *sqlRepository) UpdatePost(
 }
 
 func (r *sqlRepository) DeletePost(ctx context.Context, postID uint) error {
+	slog.Debug("deleting post", "post_id", postID)
 	_, err := gorm.
 		G[model.Post](r.db).
 		Where("id = ?", postID).

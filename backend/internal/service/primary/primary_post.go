@@ -3,6 +3,7 @@ package primary
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
@@ -26,14 +27,18 @@ func (s *primaryService) CreatePost(
 
 	// Save new post via repository
 	if err := s.repo.CreatePost(ctx, &newPost); err != nil {
+		slog.Error("failed to create post", "topic_id", topicID, "user_id", userID, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Fetch the created post with Author preloaded
 	post, err := s.repo.GetOnePost(ctx, newPost.ID)
 	if err != nil {
+		slog.Error("failed to fetch created post", "post_id", newPost.ID, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("post created", "post_id", post.ID, "topic_id", topicID, "user_id", userID)
 
 	// Return the newly created post's info
 	info := service.InfoFromPost(post)
@@ -62,8 +67,11 @@ func (s *primaryService) FetchPosts(
 	// Fetch posts from repository
 	posts, err := s.repo.GetPosts(ctx, limit, offset, topicIDPtr, userIDPtr)
 	if err != nil {
+		slog.Error("failed to fetch posts", "limit", limit, "offset", offset, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Debug("fetched posts", "count", len(posts), "limit", limit, "offset", offset)
 
 	// Convert to DTOs
 	postInfos := make([]*service.PostInfo, len(posts))
@@ -83,10 +91,14 @@ func (s *primaryService) FetchPostByID(
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("post not found", "post_id", postID)
 			return nil, service.ErrPostNotFound
 		}
+		slog.Error("failed to fetch post", "post_id", postID, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Debug("fetched post", "post_id", postID)
 
 	// Convert to DTO
 	info := service.InfoFromPost(post)
@@ -104,13 +116,16 @@ func (s *primaryService) UpdatePost(
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("post not found for update", "post_id", postID)
 			return service.ErrPostNotFound
 		}
+		slog.Error("failed to fetch post for update", "post_id", postID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Check if the user is the author
 	if post.AuthorID != userID {
+		slog.Warn("forbidden post update attempt", "post_id", postID, "user_id", userID, "author_id", post.AuthorID)
 		return service.ErrForbidden
 	}
 
@@ -129,8 +144,11 @@ func (s *primaryService) UpdatePost(
 		post.Title,
 		post.Content,
 	); err != nil {
+		slog.Error("failed to update post", "post_id", postID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("post updated", "post_id", postID, "user_id", userID)
 
 	return nil
 }
@@ -144,20 +162,26 @@ func (s *primaryService) DeletePost(
 	post, err := s.repo.GetOnePost(ctx, postID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("post not found for delete", "post_id", postID)
 			return service.ErrPostNotFound
 		}
+		slog.Error("failed to fetch post for delete", "post_id", postID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Check if the user is the author
 	if post.AuthorID != userID {
+		slog.Warn("forbidden post delete attempt", "post_id", postID, "user_id", userID, "author_id", post.AuthorID)
 		return service.ErrForbidden
 	}
 
 	// Delete post via repository
 	if err := s.repo.DeletePost(ctx, postID); err != nil {
+		slog.Error("failed to delete post", "post_id", postID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("post deleted", "post_id", postID, "user_id", userID)
 
 	return nil
 }

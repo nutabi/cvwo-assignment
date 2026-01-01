@@ -3,6 +3,7 @@ package primary
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
@@ -17,22 +18,27 @@ func (s *primaryService) RegisterUser(
 	// Check for existing username or email
 	usernameExists, err := s.repo.CheckUsernameExists(ctx, username)
 	if err != nil {
+		slog.Error("failed to check username existence", "username", username, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 	if usernameExists {
+		slog.Warn("registration failed: username taken", "username", username)
 		return nil, service.ErrUsernameTaken
 	}
 	emailExists, err := s.repo.CheckEmailExists(ctx, email)
 	if err != nil {
+		slog.Error("failed to check email existence", "email", email, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 	if emailExists {
+		slog.Warn("registration failed: email in use", "email", email)
 		return nil, service.ErrEmailInUse
 	}
 
 	// Hash password
 	phc, err := utility.ComputePHC(password)
 	if err != nil {
+		slog.Error("failed to hash password", "error", err)
 		return nil, errors.Join(service.ErrCryptoError, err)
 	}
 
@@ -45,8 +51,11 @@ func (s *primaryService) RegisterUser(
 
 	// Save new user via repository
 	if err := s.repo.CreateUser(ctx, &newUser); err != nil {
+		slog.Error("failed to create user", "username", username, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("user registered", "user_id", newUser.ID, "username", username)
 
 	// Return the newly created user's profile
 	profile := service.ProfileFromUser(&newUser, true)
@@ -58,10 +67,14 @@ func (s *primaryService) FetchUserByID(ctx context.Context, id uint) (*service.U
 	user, err := s.repo.GetUserByID(ctx, id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("user not found", "user_id", id)
 			return nil, service.ErrUserNotFound
 		}
+		slog.Error("failed to fetch user", "user_id", id, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Debug("fetched user", "user_id", id)
 
 	// Map repository user to service user profile
 	profile := service.ProfileFromUser(user, false)
@@ -95,8 +108,11 @@ func (s *primaryService) UpdateCurrentUser(
 		user.AvatarURL,
 		user.Bio,
 	); err != nil {
+		slog.Error("failed to update user", "user_id", user.ID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("user updated", "user_id", user.ID)
 
 	return nil
 }

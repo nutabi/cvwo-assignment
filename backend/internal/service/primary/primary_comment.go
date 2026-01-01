@@ -3,6 +3,7 @@ package primary
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
@@ -24,14 +25,18 @@ func (s *primaryService) CreateComment(
 
 	// Save new comment via repository
 	if err := s.repo.CreateComment(ctx, &newComment); err != nil {
+		slog.Error("failed to create comment", "post_id", postID, "user_id", userID, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Fetch the created comment with Author preloaded
 	comment, err := s.repo.GetOneComment(ctx, newComment.ID)
 	if err != nil {
+		slog.Error("failed to fetch created comment", "comment_id", newComment.ID, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("comment created", "comment_id", comment.ID, "post_id", postID, "user_id", userID)
 
 	// Return the newly created comment's info
 	info := service.InfoFromComment(comment)
@@ -60,8 +65,11 @@ func (s *primaryService) FetchComments(
 	// Fetch comments from repository
 	comments, err := s.repo.GetComments(ctx, limit, offset, postIDPtr, userIDPtr)
 	if err != nil {
+		slog.Error("failed to fetch comments", "limit", limit, "offset", offset, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Debug("fetched comments", "count", len(comments), "limit", limit, "offset", offset)
 
 	// Convert to CommentInfo slice
 	var commentInfos []*service.CommentInfo
@@ -80,10 +88,14 @@ func (s *primaryService) FetchCommentByID(
 	comment, err := s.repo.GetOneComment(ctx, commentID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("comment not found", "comment_id", commentID)
 			return nil, service.ErrCommentNotFound
 		}
+		slog.Error("failed to fetch comment", "comment_id", commentID, "error", err)
 		return nil, errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Debug("fetched comment", "comment_id", commentID)
 
 	// Convert to CommentInfo
 	info := service.InfoFromComment(comment)
@@ -100,20 +112,27 @@ func (s *primaryService) UpdateComment(
 	comment, err := s.repo.GetOneComment(ctx, commentID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("comment not found for update", "comment_id", commentID)
 			return service.ErrCommentNotFound
 		}
+		slog.Error("failed to fetch comment for update", "comment_id", commentID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Check if the user is the author of the comment
 	if comment.AuthorID != userID {
+		slog.Warn("forbidden comment update attempt", "comment_id", commentID, "user_id", userID, "author_id", comment.AuthorID)
 		return service.ErrForbidden
 	}
 
 	// Save updated comment via repository
 	if err := s.repo.UpdateComment(ctx, commentID, content); err != nil {
+		slog.Error("failed to update comment", "comment_id", commentID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("comment updated", "comment_id", commentID, "user_id", userID)
+
 	return nil
 }
 
@@ -126,19 +145,26 @@ func (s *primaryService) DeleteComment(
 	comment, err := s.repo.GetOneComment(ctx, commentID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			slog.Warn("comment not found for delete", "comment_id", commentID)
 			return service.ErrCommentNotFound
 		}
+		slog.Error("failed to fetch comment for delete", "comment_id", commentID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
 
 	// Check if the user is the author of the comment
 	if comment.AuthorID != userID {
+		slog.Warn("forbidden comment delete attempt", "comment_id", commentID, "user_id", userID, "author_id", comment.AuthorID)
 		return service.ErrForbidden
 	}
 
 	// Delete comment via repository
 	if err := s.repo.DeleteComment(ctx, commentID); err != nil {
+		slog.Error("failed to delete comment", "comment_id", commentID, "error", err)
 		return errors.Join(service.ErrDatabaseError, err)
 	}
+
+	slog.Info("comment deleted", "comment_id", commentID, "user_id", userID)
+
 	return nil
 }

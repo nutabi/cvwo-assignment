@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/nutabi/cvwo-assignment/backend/internal/model"
 	"gorm.io/gorm"
@@ -11,6 +12,7 @@ func (r *sqlRepository) CreateTopic(
 	ctx context.Context,
 	topic *model.Topic,
 ) error {
+	slog.Debug("creating topic", "author_id", topic.AuthorID)
 	return gorm.
 		G[model.Topic](r.db).
 		Create(ctx, topic)
@@ -20,6 +22,7 @@ func (r *sqlRepository) GetOneTopic(
 	ctx context.Context,
 	id uint,
 ) (*model.Topic, error) {
+	slog.Debug("fetching topic by ID", "topic_id", id)
 	topic, err := gorm.
 		G[model.Topic](r.db).
 		Preload("Author", nil).
@@ -37,6 +40,8 @@ func (r *sqlRepository) GetTopics(
 	limit, offset int,
 	userID *uint,
 ) ([]model.Topic, error) {
+	slog.Debug("fetching topics", "limit", limit, "offset", offset)
+
 	// Base query
 	query := gorm.
 		G[model.Topic](r.db).
@@ -64,6 +69,7 @@ func (r *sqlRepository) UpdateTopic(
 	name string,
 	description *string,
 ) error {
+	slog.Debug("updating topic", "topic_id", topicID)
 	_, err := gorm.
 		G[model.Topic](r.db).
 		Where("id = ?", topicID).
@@ -75,6 +81,7 @@ func (r *sqlRepository) DeleteTopic(
 	ctx context.Context,
 	topicID uint,
 ) error {
+	slog.Debug("deleting topic", "topic_id", topicID)
 	_, err := gorm.
 		G[model.Topic](r.db).
 		Where("id = ?", topicID).

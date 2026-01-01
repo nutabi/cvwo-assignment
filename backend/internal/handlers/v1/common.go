@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -50,6 +51,11 @@ func handleServiceError(c *gin.Context, err error) {
 			// as well as the following errors:
 			// - ErrCryptoError
 			// - ErrDatabaseError
+			slog.Error("internal server error in handler",
+				"method", c.Request.Method,
+				"path", c.Request.URL.Path,
+				"error", err,
+			)
 			handleError(c, http.StatusInternalServerError, "Internal server error")
 		}
 		return
