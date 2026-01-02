@@ -12,6 +12,60 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 )
 
+// Swagger model definitions
+
+// ErrorResponse represents an error response
+type ErrorResponse struct {
+	Error string `json:"error" example:"error message"`
+}
+
+// RegisterRequest represents user registration request
+type RegisterRequest struct {
+	Username string `json:"username" binding:"required" example:"johndoe"`
+	Email    string `json:"email" binding:"required" example:"john@example.com"`
+	Password string `json:"password" binding:"required" example:"securepassword123"`
+}
+
+// UpdateUserRequest represents user profile update request
+type UpdateUserRequest struct {
+	AvatarUrl *string `json:"avatar_url" example:"https://example.com/avatar.jpg"`
+	Bio       *string `json:"bio" example:"Software developer"`
+}
+
+// CreateTopicRequest represents topic creation request
+type CreateTopicRequest struct {
+	Title       string  `json:"title" binding:"required" example:"General Discussion"`
+	Description *string `json:"description" example:"A place for general conversations"`
+}
+
+// UpdateTopicRequest represents topic update request
+type UpdateTopicRequest struct {
+	Title       *string `json:"title" example:"Updated Topic Title"`
+	Description *string `json:"description" example:"Updated description"`
+}
+
+// CreatePostRequest represents post creation request
+type CreatePostRequest struct {
+	Title   string  `json:"title" binding:"required" example:"My First Post"`
+	Content *string `json:"content" example:"This is the content of my post"`
+}
+
+// UpdatePostRequest represents post update request
+type UpdatePostRequest struct {
+	Title   *string `json:"title" example:"Updated Post Title"`
+	Content *string `json:"content" example:"Updated post content"`
+}
+
+// CreateCommentRequest represents comment creation request
+type CreateCommentRequest struct {
+	Content string `json:"content" binding:"required" example:"This is a comment"`
+}
+
+// UpdateCommentRequest represents comment update request
+type UpdateCommentRequest struct {
+	Content *string `json:"content" example:"Updated comment content"`
+}
+
 // Helper function to respond with an error message and HTTP status code.
 func handleError(c *gin.Context, code int, message string) {
 	c.JSON(code, gin.H{"error": message})

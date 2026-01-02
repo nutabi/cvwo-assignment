@@ -16,9 +16,9 @@ func RegisterRoutes(
 	authGroup := r.Group("/auth")
 	authGroup.Use(authRateLimiter)
 	{
-		authGroup.POST("/login", authMiddleware.LoginHandler)
-		authGroup.POST("/logout", authMiddleware.LogoutHandler)
-		authGroup.POST("/refresh", authMiddleware.RefreshHandler)
+		authGroup.POST("/login", handleLogin(authMiddleware.LoginHandler))
+		authGroup.POST("/logout", handleLogout(authMiddleware.LogoutHandler))
+		authGroup.POST("/refresh", handleTokenRefresh(authMiddleware.RefreshHandler))
 		authGroup.POST("/register", handleUserRegistration(service))
 	}
 

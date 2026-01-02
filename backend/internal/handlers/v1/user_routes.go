@@ -7,7 +7,17 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 )
 
-// Handle GET {ROOT}/users/:user_id
+// @Summary      Get user profile by ID
+// @Description  Retrieve public profile information for a specific user
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user_id path int true "User ID"
+// @Success      200 {object} service.UserProfile
+// @Failure      400 {object} ErrorResponse "Invalid user ID"
+// @Failure      404 {object} ErrorResponse "User not found"
+// @Failure      500 {object} ErrorResponse
+// @Router       /users/{user_id} [get]
 func handlePublicUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse user ID from path
@@ -28,7 +38,16 @@ func handlePublicUserProfile(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle GET {ROOT}/users/me
+// @Summary      Get current user profile
+// @Description  Retrieve the authenticated user's profile information
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} service.UserProfile
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      500 {object} ErrorResponse
+// @Router       /users/me [get]
 func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -49,7 +68,18 @@ func handleCurrentUserProfile(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle PATCH {ROOT}/users/me
+// @Summary      Update current user profile
+// @Description  Update the authenticated user's avatar URL or bio
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body UpdateUserRequest true "Profile update details"
+// @Success      204 "No Content"
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      422 {object} ErrorResponse "Invalid input"
+// @Failure      500 {object} ErrorResponse
+// @Router       /users/me [patch]
 func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -59,10 +89,7 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Parse request body
-		var updateReq struct {
-			AvatarUrl *string `form:"avatar_url" json:"avatar_url"`
-			Bio       *string `form:"bio" json:"bio"`
-		}
+		var updateReq UpdateUserRequest
 		if !mustBindReqBody(c, &updateReq) {
 			return
 		}

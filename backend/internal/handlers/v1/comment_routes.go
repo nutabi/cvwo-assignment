@@ -7,7 +7,19 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 )
 
-// Handle POST {ROOT}/posts/:post_id/comments
+// @Summary      Create a new comment
+// @Description  Create a new comment on a specific post
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        post_id path int true "Post ID"
+// @Param        request body CreateCommentRequest true "Comment creation details"
+// @Success      201 {object} service.CommentInfo
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      404 {object} ErrorResponse "Post not found"
+// @Failure      500 {object} ErrorResponse
+// @Router       /posts/{post_id}/comments [post]
 func handleCreateComment(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -23,9 +35,7 @@ func handleCreateComment(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Parse request body
-		var req struct {
-			Content string `json:"content" form:"content" binding:"required"`
-		}
+		var req CreateCommentRequest
 		if !mustBindReqBody(c, &req) {
 			return
 		}
@@ -41,7 +51,18 @@ func handleCreateComment(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle GET {ROOT}/comments
+// @Summary      List comments
+// @Description  Get a paginated list of comments, optionally filtered by post ID or user ID
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Param        limit query int false "Number of items per page" default(20)
+// @Param        offset query int false "Number of items to skip" default(0)
+// @Param        post_id query int false "Filter by post ID"
+// @Param        user_id query int false "Filter by user ID"
+// @Success      200 {array} service.CommentInfo
+// @Failure      500 {object} ErrorResponse
+// @Router       /comments [get]
 func handleListComments(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse pagination parameters
@@ -68,7 +89,17 @@ func handleListComments(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle GET {ROOT}/comments/:comment_id
+// @Summary      Get comment by ID
+// @Description  Retrieve detailed information about a specific comment
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Param        comment_id path int true "Comment ID"
+// @Success      200 {object} service.CommentInfo
+// @Failure      400 {object} ErrorResponse "Invalid comment ID"
+// @Failure      404 {object} ErrorResponse "Comment not found"
+// @Failure      500 {object} ErrorResponse
+// @Router       /comments/{comment_id} [get]
 func handleGetCommentInfo(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse comment ID from path
@@ -88,6 +119,21 @@ func handleGetCommentInfo(svc service.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary      Update a comment
+// @Description  Update a comment's content (author only)
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        comment_id path int true "Comment ID"
+// @Param        request body UpdateCommentRequest true "Comment update details"
+// @Success      204 "No Content"
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      403 {object} ErrorResponse "Forbidden - not the author"
+// @Failure      404 {object} ErrorResponse "Comment not found"
+// @Failure      422 {object} ErrorResponse "Invalid input"
+// @Failure      500 {object} ErrorResponse
+// @Router       /comments/{comment_id} [patch]
 func handleUpdateComment(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -103,9 +149,7 @@ func handleUpdateComment(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Parse request body
-		var req struct {
-			Content *string `json:"content" form:"content"`
-		}
+		var req UpdateCommentRequest
 		if !mustBindReqBody(c, &req) {
 			return
 		}
@@ -132,6 +176,19 @@ func handleUpdateComment(svc service.Service) gin.HandlerFunc {
 	}
 }
 
+// @Summary      Delete a comment
+// @Description  Delete a comment (author only)
+// @Tags         comments
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        comment_id path int true "Comment ID"
+// @Success      204 "No Content"
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      403 {object} ErrorResponse "Forbidden - not the author"
+// @Failure      404 {object} ErrorResponse "Comment not found"
+// @Failure      500 {object} ErrorResponse
+// @Router       /comments/{comment_id} [delete]
 func handleDeleteComment(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
