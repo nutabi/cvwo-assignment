@@ -26,6 +26,9 @@ var (
 	// Topic not found error
 	ErrTopicNotFound = errors.New("topic not found")
 
+	// Topic title taken error
+	ErrTopicTitleTaken = errors.New("topic title already exists")
+
 	// Forbidden access error
 	ErrForbidden = errors.New("forbidden")
 

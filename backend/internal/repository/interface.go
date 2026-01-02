@@ -24,6 +24,7 @@ type Repository interface {
 	GetOneTopic(ctx context.Context, id uint) (*model.Topic, error)
 	GetTopics(ctx context.Context, limit, offset int, userID *uint) ([]model.Topic, error)
 	CheckTopicExists(ctx context.Context, id uint) (bool, error)
+	CheckTopicTitleExists(ctx context.Context, title string) (bool, error)
 	UpdateTopic(ctx context.Context, topicID uint, name string, description *string) error
 	DeleteTopic(ctx context.Context, topicID uint) error
 

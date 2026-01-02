@@ -78,6 +78,21 @@ func (r *sqlRepository) CheckTopicExists(
 	return count > 0, nil
 }
 
+func (r *sqlRepository) CheckTopicTitleExists(
+	ctx context.Context,
+	title string,
+) (bool, error) {
+	slog.Debug("checking topic title existence", "title", title)
+	count, err := gorm.
+		G[model.Topic](r.db).
+		Where("name = ?", title).
+		Count(ctx, "id")
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r *sqlRepository) UpdateTopic(
 	ctx context.Context,
 	topicID uint,

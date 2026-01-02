@@ -109,6 +109,21 @@ func TestCreateTopic(t *testing.T) {
 			},
 		},
 		{
+			name: "duplicate topic title",
+			requestBody: map[string]interface{}{
+				"title":       "My First Topic",
+				"description": "This should fail due to duplicate title",
+			},
+			useAuth:        true,
+			expectedStatus: http.StatusConflict,
+			checkResponse: func(t *testing.T, w *httptest.ResponseRecorder) {
+				var response map[string]interface{}
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Contains(t, response["error"], "topic title already exists")
+			},
+		},
+		{
 			name:           "missing title",
 			requestBody:    map[string]interface{}{},
 			useAuth:        true,

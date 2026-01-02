@@ -16,6 +16,17 @@ func (s *primaryService) CreateTopic(
 	title string,
 	description *string,
 ) (*service.TopicInfo, error) {
+	// Check if topic title already exists
+	exists, err := s.repo.CheckTopicTitleExists(ctx, title)
+	if err != nil {
+		slog.Error("failed to check topic title existence", "title", title, "error", err)
+		return nil, errors.Join(service.ErrDatabaseError, err)
+	}
+	if exists {
+		slog.Warn("topic title already exists", "title", title)
+		return nil, service.ErrTopicTitleTaken
+	}
+
 	// Create new topic model
 	newTopic := model.Topic{
 		Name:        title,
