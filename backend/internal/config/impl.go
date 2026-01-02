@@ -59,7 +59,7 @@ func LoadConfig() (Config, error) {
 	corsOriginsStr := os.Getenv("CORS_ALLOWED_ORIGINS")
 	var corsOrigins []string
 	if corsOriginsStr != "" {
-		for _, origin := range strings.Split(corsOriginsStr, ",") {
+		for origin := range strings.SplitSeq(corsOriginsStr, ",") {
 			if trimmed := strings.TrimSpace(origin); trimmed != "" {
 				corsOrigins = append(corsOrigins, trimmed)
 			}
@@ -104,6 +104,18 @@ func LoadConfig() (Config, error) {
 	if isBad {
 		return nil, fmt.Errorf("missing or invalid environment variables")
 	}
+
+	// Log all config values at debug level
+	slog.Debug("configuration loaded",
+		"server_hostname", cfg.serverHostname,
+		"server_port", cfg.serverPort,
+		"database_url", cfg.databaseUrl,
+		"jwt_secret", "***REDACTED***",
+		"debug", cfg.debug,
+		"cors_origins", cfg.corsOrigins,
+		"log_level", cfg.logLevel,
+		"log_root", cfg.logRoot,
+	)
 
 	return &cfg, nil
 }
