@@ -64,43 +64,6 @@ func handleServiceError(c *gin.Context, err error) {
 	}
 }
 
-// Tries to retrieve a string query parameter from the request context.
-// If the parameter is not present, returns the provided default value.
-func tryGetStrQuery(c *gin.Context, paramName string, defaultValue string) (value string) {
-	value = c.Query(paramName)
-	if value == "" {
-		value = defaultValue
-	}
-	return value
-}
-
-// Tries to retrieve an integer query parameter from the request context.
-// If the parameter is not present or invalid, returns the provided default value.
-func tryGetIntQuery(c *gin.Context, paramName string, defaultValue int) (value int) {
-	paramStr := c.Query(paramName)
-	parsedValue, err := strconv.Atoi(paramStr)
-	if err != nil {
-		value = defaultValue
-	} else {
-		value = parsedValue
-	}
-	return value
-}
-
-// Tries to retrieve a boolean query parameter from the request context.
-// If the parameter is not present or invalid, returns the provided default value.
-func tryGetBoolQuery(c *gin.Context, paramName string, defaultValue bool) (value bool) {
-	switch c.Query(paramName) {
-	case "1", "true":
-		value = true
-	case "0", "false":
-		value = false
-	default:
-		value = defaultValue
-	}
-	return value
-}
-
 // Tries to retrieve an unsigned integer ID query parameter from the request context.
 // If the parameter is not present or invalid, returns 0.
 func tryGetIDQuery(c *gin.Context, paramName string) uint {
