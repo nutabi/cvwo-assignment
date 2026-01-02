@@ -124,7 +124,7 @@ func mustGetIntParam(c *gin.Context, paramName string) (int, bool) {
 
 func mustGetIDParam(c *gin.Context, paramName string) (uint, bool) {
 	id, ok := mustGetIntParam(c, paramName)
-	if !ok || id <= 0 {
+	if ok && id <= 0 {
 		handleError(c, http.StatusBadRequest, "invalid ID parameter: "+paramName)
 		return 0, false
 	}
