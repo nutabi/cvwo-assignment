@@ -36,3 +36,6 @@ godeps/
 
 # Agent instruction files
 .github/copilot-instructions.md
+
+# Development database
+data.db
