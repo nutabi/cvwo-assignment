@@ -18,9 +18,6 @@ I can access my account and create content.
 - As a Registered User, I can sign out, so that I can securely end
 my session.
 
-- As a Registered User who forgot my password, I can reset it by entering an
-admin-provided recovery code, so that I can regain access to my account.
-
 ### 1.1.2. Topics
 
 - As a Registered User, I can create topics, so that I can
@@ -80,22 +77,29 @@ with no prior experience in Go.
 can be unstable from time to time, it also means there is an active community
 behind it ready to answer questions.
 
-Beside the web framwork, I have also decided to use:
+Beside the web framework, I have also decided to use:
 
-- `jwt`: For stateless authentication.
+- `gin-jwt`: For stateless JWT-based authentication with automatic token refresh.
 
-- `bun`: For SQL-agnostic database interface.
+- `gorm`: For SQL-agnostic database ORM with migrations support.
+
+- `argon2`: For secure password hashing using the Argon2id algorithm.
 
 ### 1.2.2. Database
 
 SQLite has been my go-to database for all of my web apps, be it written in
-Python, Rust, or now, Go. For this project, it seems like a no-brainer. It's
-fast, serverless, and easy-to-use. However, since this is an assignment, I
-have decided to try out something new, something that is most commonly used in
-newer enterprise applications: PostgreSQL.
+Python, Rust, or now, Go. For this project, it's a perfect fit:
 
-Furthermore, PostgreSQL has a lot of out-of-the-box features that I used to
-implement manually in SQLite, such as timestamp, advanced triggers, etc.
+- **Serverless**: No separate database process to manage
+- **Fast**: Excellent performance for read-heavy workloads like forums
+- **Portable**: Single file database that's easy to backup and deploy
+- **GORM Support**: Full ORM support with automatic migrations
+- **Soft Deletes**: Built-in support via GORM's `DeletedAt` field
+
+The database uses GORM's embedded `gorm.Model` which provides:
+- Auto-incrementing ID (primary key)
+- Timestamps (CreatedAt, UpdatedAt)
+- Soft delete support (DeletedAt)
 
 ### 1.2.3. Frontend
 
@@ -143,62 +147,56 @@ changes will be made to ownership of topics, posts, and comments on deletion.
 - Soft-deletion (with `is_deleted`) is used to allow archival and undoing,
 except for users. This also allows re-usability of usernames.
 
-### 1.3.1. `user`
+### 1.3.1. `users`
 
-| name          | type      | constraints      |
-|---------------|-----------|------------------|
-| user_id       | integer   | primary key      |
-| username      | string    | not null, unique |
-| password_hash | string    | not null         |
-| created_at    | timestamp | not null         |
-| updated_at    | timestamp | not null         |
+| name       | type      | constraints      |
+|------------|-----------|------------------|
+| id         | integer   | primary key      |
+| username   | string    | not null, unique |
+| email      | string    | not null, unique |
+| phc        | string    | not null (Argon2id hash) |
+| avatar_url | string    | nullable         |
+| bio        | text      | nullable         |
+| created_at | timestamp | not null         |
+| updated_at | timestamp | not null         |
+| deleted_at | timestamp | nullable (soft delete) |
 
-### 1.3.2. `recovery`
+### 1.3.2. `topics`
 
-| name        | type      | constraints                                        |
-|-------------|-----------|----------------------------------------------------|
-| recovery_id | integer   | primary key                                        |
-| user_id     | integer   | foreign key user(user_id) delete cascade, not null |
-| code        | string    | not null, unique                                   |
-| created_at  | timestamp | not null                                           |
-| used_at     | timestamp |                                                    |
+| name        | type      | constraints                                       |
+|-------------|-----------|---------------------------------------------------|
+| id          | integer   | primary key                                       |
+| name        | string    | not null, unique                                  |
+| description | text      | nullable                                          |
+| author_id   | integer   | foreign key users(id) cascade delete, not null    |
+| created_at  | timestamp | not null                                          |
+| updated_at  | timestamp | not null                                          |
+| deleted_at  | timestamp | nullable (soft delete)                            |
 
-### 1.3.3. `topic`
-
-| name        | type      | constraints                                        |
-|-------------|-----------|----------------------------------------------------|
-| topic_id    | integer   | primary key                                        |
-| owned_by    | integer   | foreign key user(user_id) delete cascade, not null |
-| title       | string    | not null, unique                                   |
-| description | string    |                                                    |
-| is_deleted  | boolean   | not null, default false                            |
-| created_at  | timestamp | not null                                           |
-| updated_at  | timestamp | not null                                           |
-
-### 1.3.4. `post`
+### 1.3.3. `posts`
 
 | name       | type      | constraints                                          |
 |------------|-----------|------------------------------------------------------|
-| post_id    | integer   | primary key                                          |
-| owned_by   | integer   | foreign key user(user_id) delete cascade, not null   |
-| topic_id   | integer   | foreign key topic(topic_id) delete cascade, not null |
+| id         | integer   | primary key                                          |
 | title      | string    | not null                                             |
-| body       | string    |                                                      |
-| is_deleted | boolean   | not null, default false                              |
+| content    | text      | nullable                                             |
+| author_id  | integer   | foreign key users(id) cascade delete, not null       |
+| topic_id   | integer   | foreign key topics(id) cascade delete, not null      |
 | created_at | timestamp | not null                                             |
 | updated_at | timestamp | not null                                             |
+| deleted_at | timestamp | nullable (soft delete)                               |
 
-### 1.3.5. `comment`
+### 1.3.4. `comments`
 
 | name       | type      | constraints                                        |
-|------------|-----------|----------------------------------------------------|
-| comment_id | integer   | primary key                                        |
-| owned_by   | integer   | foreign key user(user_id) delete cascade, not null |
-| post_id    | integer   | foreign key post(post_id) delete cascade, not null |
-| text       | string    | not null                                           |
-| is_deleted | boolean   | not null, default false                            |
+|------------|-----------|----------------------------------------------------||
+| id         | integer   | primary key                                        |
+| content    | text      | not null                                           |
+| author_id  | integer   | foreign key users(id) cascade delete, not null     |
+| post_id    | integer   | foreign key posts(id) cascade delete, not null     |
 | created_at | timestamp | not null                                           |
 | updated_at | timestamp | not null                                           |
+| deleted_at | timestamp | nullable (soft delete)                             |
 
 ## 1.4. Project Structures
 
@@ -212,11 +210,16 @@ backend/
 │   └── api/
 │       └── main.go          # Application entry point
 ├── internal/
+│   ├── app/                 # Application setup and initialization
+│   ├── config/              # Configuration management
 │   ├── handlers/            # HTTP handlers/controllers
-│   ├── models/              # Data models/structs
-│   ├── services/            # Business logic layer
-│   └── repository/          # Database access layer
-├── migrations/              # Database migrations
+│   ├── middleware/          # HTTP middlewares
+│   ├── model/               # Data models/structs
+│   ├── repository/          # Database access layer
+│   ├── service/             # Business logic layer
+│   ├── test/                # Integration tests
+│   └── utility/             # Utility functions
+├── Dockerfile               # Dockerfile for backend
 ├── go.mod
 └── go.sum
 
