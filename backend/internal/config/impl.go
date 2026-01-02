@@ -101,12 +101,9 @@ func LoadConfig() (Config, error) {
 		logRoot:        logRoot,
 	}
 
-	if isBad {
-		return nil, fmt.Errorf("missing or invalid environment variables")
-	}
-
-	// Log all config values at debug level
-	slog.Debug("configuration loaded",
+	// Log config at INFO level (before checking isBad) so it shows even if there are errors
+	// Uses default logger since custom logger isn't set up yet
+	slog.Info("loading configuration",
 		"server_hostname", cfg.serverHostname,
 		"server_port", cfg.serverPort,
 		"database_url", cfg.databaseUrl,
@@ -116,6 +113,10 @@ func LoadConfig() (Config, error) {
 		"log_level", cfg.logLevel,
 		"log_root", cfg.logRoot,
 	)
+
+	if isBad {
+		return nil, fmt.Errorf("missing or invalid environment variables")
+	}
 
 	return &cfg, nil
 }
