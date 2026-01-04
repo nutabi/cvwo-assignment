@@ -8,16 +8,46 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 )
 
+// @Summary      User login
+// @Description  Authenticate user and return JWT token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body LoginRequest true "User login details"
+// @Success      200 {object} LoginResponse
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      500 {object} ErrorResponse
+// @Router       /auth/login [post]
 func handleLogin(h gin.HandlerFunc) gin.HandlerFunc {
 	// Wrap login handler to add documentation
 	return h
 }
 
+// @Summary      User logout
+// @Description  Invalidate user JWT token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} map[string]string "Logout successful message"
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      500 {object} ErrorResponse
+// @Router       /auth/logout [post]
 func handleLogout(h gin.HandlerFunc) gin.HandlerFunc {
 	// Wrap logout handler to add documentation
 	return h
 }
 
+// @Summary      Refresh JWT token
+// @Description  Refresh user JWT token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} LoginResponse
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      500 {object} ErrorResponse
+// @Router       /auth/refresh [post]
 func handleTokenRefresh(h gin.HandlerFunc) gin.HandlerFunc {
 	// Wrap token refresh handler to add documentation
 	return h
