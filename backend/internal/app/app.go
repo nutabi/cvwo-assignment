@@ -127,7 +127,7 @@ func (a *App) Start() {
 
 	// Add routes with authentication rate limiter
 	authRateLimiter := middleware.NewAuthRateLimiter()
-	v1.RegisterRoutes(r.Group("/v1"), a.service, a.authMiddleware, authRateLimiter)
+	v1.RegisterRoutes(r.Group("/api/v1"), a.service, a.authMiddleware, authRateLimiter)
 
 	// Create HTTP server for graceful shutdown
 	srv := &http.Server{

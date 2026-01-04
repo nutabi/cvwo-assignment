@@ -7,7 +7,17 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 )
 
-// Handle GET {ROOT}/topics
+// @Summary      List topics
+// @Description  Get a paginated list of topics, optionally filtered by user ID
+// @Tags         topics
+// @Accept       json
+// @Produce      json
+// @Param        limit query int false "Number of items per page" default(20)
+// @Param        offset query int false "Number of items to skip" default(0)
+// @Param        user_id query int false "Filter by user ID"
+// @Success      200 {array} service.TopicInfo
+// @Failure      500 {object} ErrorResponse
+// @Router       /topics [get]
 func handleListTopics(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse query parameters for pagination
@@ -33,7 +43,18 @@ func handleListTopics(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle POST {ROOT}/topics
+// @Summary      Create a new topic
+// @Description  Create a new discussion topic
+// @Tags         topics
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body CreateTopicRequest true "Topic creation details"
+// @Success      201 {object} service.TopicInfo
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      409 {object} ErrorResponse "Topic title already exists"
+// @Failure      500 {object} ErrorResponse
+// @Router       /topics [post]
 func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -43,10 +64,7 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Parse request body
-		var req struct {
-			Title       string  `json:"title" form:"title" binding:"required"`
-			Description *string `json:"description" form:"description"`
-		}
+		var req CreateTopicRequest
 		if !mustBindReqBody(c, &req) {
 			return
 		}
@@ -68,7 +86,17 @@ func handleCreateTopic(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle GET {ROOT}/topics/:topic_id
+// @Summary      Get topic by ID
+// @Description  Retrieve detailed information about a specific topic
+// @Tags         topics
+// @Accept       json
+// @Produce      json
+// @Param        topic_id path int true "Topic ID"
+// @Success      200 {object} service.TopicInfo
+// @Failure      400 {object} ErrorResponse "Invalid topic ID"
+// @Failure      404 {object} ErrorResponse "Topic not found"
+// @Failure      500 {object} ErrorResponse
+// @Router       /topics/{topic_id} [get]
 func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Parse topic ID from path
@@ -92,7 +120,21 @@ func handleGetTopicInfo(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle PATCH {ROOT}/topics/:topic_id
+// @Summary      Update a topic
+// @Description  Update a topic's title or description (author only)
+// @Tags         topics
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        topic_id path int true "Topic ID"
+// @Param        request body UpdateTopicRequest true "Topic update details"
+// @Success      204 "No Content"
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      403 {object} ErrorResponse "Forbidden - not the author"
+// @Failure      404 {object} ErrorResponse "Topic not found"
+// @Failure      422 {object} ErrorResponse "Invalid input"
+// @Failure      500 {object} ErrorResponse
+// @Router       /topics/{topic_id} [patch]
 func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context
@@ -108,10 +150,7 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 		}
 
 		// Parse request body
-		var req struct {
-			Title       *string `json:"title" form:"title"`
-			Description *string `json:"description" form:"description"`
-		}
+		var req UpdateTopicRequest
 		if !mustBindReqBody(c, &req) {
 			return
 		}
@@ -139,7 +178,19 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 	}
 }
 
-// Handle DELETE {ROOT}/topics/:topic_id
+// @Summary      Delete a topic
+// @Description  Delete a topic (author only)
+// @Tags         topics
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        topic_id path int true "Topic ID"
+// @Success      204 "No Content"
+// @Failure      401 {object} ErrorResponse "Unauthorized"
+// @Failure      403 {object} ErrorResponse "Forbidden - not the author"
+// @Failure      404 {object} ErrorResponse "Topic not found"
+// @Failure      500 {object} ErrorResponse
+// @Router       /topics/{topic_id} [delete]
 func handleDeleteTopic(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve authenticated user from context

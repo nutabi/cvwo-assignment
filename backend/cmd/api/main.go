@@ -1,3 +1,19 @@
+// @title           CVWO Forum API
+// @version         1.0
+// @description     API for CVWO forum assignment backend
+// @termsOfService  http://swagger.io/terms/
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
 package main
 
 import (
@@ -7,7 +23,6 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/config"
 )
 
-// Entry point for the API server
 func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {

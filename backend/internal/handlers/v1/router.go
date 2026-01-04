@@ -4,6 +4,10 @@ import (
 	gin_jwt "github.com/appleboy/gin-jwt/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/nutabi/cvwo-assignment/backend/docs"
 )
 
 func RegisterRoutes(
@@ -12,13 +16,15 @@ func RegisterRoutes(
 	authMiddleware *gin_jwt.GinJWTMiddleware,
 	authRateLimiter gin.HandlerFunc,
 ) {
+	// Add Swagger documentation route
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// Add authentication routes with rate limiting
 	authGroup := r.Group("/auth")
 	authGroup.Use(authRateLimiter)
 	{
-		authGroup.POST("/login", authMiddleware.LoginHandler)
-		authGroup.POST("/logout", authMiddleware.LogoutHandler)
-		authGroup.POST("/refresh", authMiddleware.RefreshHandler)
+		authGroup.POST("/login", handleLogin(authMiddleware.LoginHandler))
+		authGroup.POST("/logout", handleLogout(authMiddleware.LogoutHandler))
+		authGroup.POST("/refresh", handleTokenRefresh(authMiddleware.RefreshHandler))
 		authGroup.POST("/register", handleUserRegistration(service))
 	}
 
