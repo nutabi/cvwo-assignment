@@ -19,10 +19,24 @@ type ErrorResponse struct {
 	Error string `json:"error" example:"error message"`
 }
 
+// LoginResponse represents user login response with JWT token
+type LoginResponse struct {
+	AccessToken  string `json:"access_token"`
+	ExpiresIn    int64  `json:"expires_in" example:"300"`
+	RefreshToken string `json:"refresh_token"`
+	TokenType    string `json:"token_type" example:"Bearer"`
+}
+
 // RegisterRequest represents user registration request
 type RegisterRequest struct {
 	Username string `json:"username" binding:"required" example:"johndoe"`
 	Email    string `json:"email" binding:"required" example:"john@example.com"`
+	Password string `json:"password" binding:"required" example:"securepassword123"`
+}
+
+// LoginRequest represents user login request
+type LoginRequest struct {
+	Username string `json:"username" binding:"required" example:"johndoe"`
 	Password string `json:"password" binding:"required" example:"securepassword123"`
 }
 
