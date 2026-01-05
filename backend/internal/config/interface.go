@@ -4,13 +4,13 @@ import "log/slog"
 
 // Config interface defines methods to access configuration settings
 type Config interface {
-	// Get server hostname, like localhost or example.com.
+	// Get server hostname for cookies/domain, like localhost or example.com.
 	GetServerHostname() string
 
 	// Get server listening port, like 8080.
 	GetServerPort() int
 
-	// Get full server address in the format hostname:port.
+	// Get full server listen address (always 0.0.0.0:port for Docker).
 	GetServerAddress() string
 
 	// Get database connection string.
