@@ -222,50 +222,99 @@ backend/
 ├── Dockerfile               # Dockerfile for backend
 ├── go.mod
 └── go.sum
-
-frontend/
-├── public/
-│   ├── index.html
-│   └── favicon.ico
-├── src/
-│   ├── api/                   # API client & HTTP requests
-│   │   ├── client.ts          # Axios/fetch config
-│   │   └── userApi.ts         # User-related API calls
-│   ├── components/            # Reusable UI components
-│   │   ├── common/            # Generic components
-│   │   │   ├── Button.tsx
-│   │   │   └── Input.tsx
-│   │   └── layout/            # Layout components
-│   │       ├── Header.tsx
-│   │       └── Sidebar.tsx
-│   ├── features/              # Feature-based modules
-│   │   └── users/
-│   │       ├── UserList.tsx
-│   │       ├── UserForm.tsx
-│   │       └── userSlice.ts   # With Redux
-│   ├── hooks/                 # Custom React hooks
-│   │   └── useAuth.ts
-│   ├── pages/                 # Page/route components
-│   │   ├── HomePage.tsx
-│   │   ├── UserPage.tsx
-│   │   └── NotFoundPage.tsx
-│   ├── services/              # Business logic
-│   │   └── authService.ts
-│   ├── store/                 # State management (with Redux)
-│   │   └── store.ts
-│   ├── types/                 # TypeScript interfaces
-│   │   └── user.ts
-│   ├── utils/                 # Utility functions
-│   │   └── validators.ts
-│   ├── App.tsx                # Main app component
-│   ├── main.tsx               # Entry point
-│   └── routes.tsx             # Route definitions
-└── package.json
 ```
 
-# 2. Executions
+# 2. Installation
 
-To be written...
+## 2.1. Prerequisites
+
+- Go 1.25.5 or higher
+- Docker and Docker Compose (for containerized deployment)
+- Git
+
+## 2.2. Quick Start with Docker Compose
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd cvwo-assignment
+   ```
+
+2. Create environment file:
+   ```bash
+   cp example.env .env
+   ```
+
+3. Edit `.env` and update the `JWT_SECRET` to a secure random string:
+   ```bash
+   # Generate a random secret (on macOS/Linux):
+   openssl rand -base64 32
+   ```
+
+4. Start the backend service:
+   ```bash
+   docker compose up -d
+   ```
+
+5. The backend API will be available at `http://localhost:8080`
+
+6. View logs:
+   ```bash
+   docker compose logs -f backend
+   ```
+
+7. Stop the service:
+   ```bash
+   docker compose down
+   ```
+
+## 2.3. Manual Backend Setup (Development)
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Install dependencies:
+   ```bash
+   go mod download
+   ```
+
+3. Create a `.env` file in the project root (copy from `example.env`):
+   ```bash
+   cp ../example.env ../.env
+   ```
+
+4. Update the `.env` file with appropriate values, especially:
+   - `JWT_SECRET`: Set to a secure random string
+   - `DEBUG`: Set to `true` for development
+   - `DATABASE_URL`: Path to SQLite database file
+
+5. Run the backend:
+   ```bash
+   go run cmd/api/main.go
+   ```
+
+6. The API will be available at `http://localhost:8080`
+
+## 2.4. Running Tests
+
+Run all tests in the backend:
+```bash
+cd backend
+go test ./...
+```
+
+Run tests with verbose output:
+```bash
+go test -v ./...
+```
+
+Run tests with coverage:
+```bash
+go test -cover ./...
+```
+
 
 # 3. AI Usage Disclosure
 
@@ -302,7 +351,7 @@ Do not generate any code.
 I then decide if the suggestions are valid and relevant before implementing the
 fixes myself.
 
-## 3.2. Testing & Documentation
+## 3.3. Testing & Documentation
 
 Agentic AI was used to autonomously generate code and non-code artifacts for
 the following parts of the project:

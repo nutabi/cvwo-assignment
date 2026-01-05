@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cvwo-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - backend-data:/root/data
+    restart: unless-stopped
+    networks:
+      - cvwo-network
+
+networks:
+  cvwo-network:
+    driver: bridge
+
+volumes:
+  backend-data:
+    driver: local

@@ -28,7 +28,8 @@ target/
 godeps/
 
 # Environment files
-.env
+*.env
+!example.env
 
 # OS-generated files
 .DS_Store

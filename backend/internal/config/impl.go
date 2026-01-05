@@ -117,7 +117,7 @@ func (c *config) GetServerPort() int {
 }
 
 func (c *config) GetServerAddress() string {
-	return c.serverHostname + ":" + fmt.Sprintf("%d", c.serverPort)
+	return "0.0.0.0:" + fmt.Sprintf("%d", c.serverPort)
 }
 
 func (c *config) GetDSN() string {
