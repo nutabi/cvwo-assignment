@@ -27,10 +27,6 @@ target/
 # Project-local godep directory
 godeps/
 
-# Environment files
-*.env
-!example.env
-
 # OS-generated files
 .DS_Store
 .Thumbs.db
