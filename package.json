@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "eslint-plugin-react-dom": "^2.5.3",
+    "eslint-plugin-react-x": "^2.5.3"
+  }
+}
