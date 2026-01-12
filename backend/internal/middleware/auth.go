@@ -97,8 +97,34 @@ func NewAuthConfig(
 		CookieName:     CookieName,
 		CookieSameSite: http.SameSiteDefaultMode,
 		Unauthorized: func(c *gin.Context, code int, message string) {
+			// Map JWT errors to error codes
+			errorCode := "UNAUTHORIZED"
+			errorMessage := message
+
+			switch message {
+			case gin_jwt.ErrFailedAuthentication.Error():
+				errorCode = "INVALID_CREDENTIALS"
+				errorMessage = "invalid username or password"
+			case gin_jwt.ErrMissingLoginValues.Error():
+				errorCode = "MISSING_LOGIN_VALUES"
+				errorMessage = "missing username or password"
+			case gin_jwt.ErrExpiredToken.Error():
+				errorCode = "TOKEN_EXPIRED"
+				errorMessage = "token has expired"
+			case gin_jwt.ErrEmptyAuthHeader.Error():
+				errorCode = "UNAUTHORIZED"
+				errorMessage = "missing authentication token"
+			case gin_jwt.ErrInvalidAuthHeader.Error():
+				errorCode = "TOKEN_INVALID"
+				errorMessage = "invalid authentication token"
+			case gin_jwt.ErrEmptyCookieToken.Error():
+				errorCode = "UNAUTHORIZED"
+				errorMessage = "missing authentication cookie"
+			}
+
 			c.JSON(code, gin.H{
-				"error": message,
+				"error_code":    errorCode,
+				"error_message": errorMessage,
 			})
 		},
 	}
