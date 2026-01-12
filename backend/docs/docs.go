@@ -40,7 +40,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.LoginRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.LoginRequest"
                         }
                     }
                 ],
@@ -48,19 +48,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.LoginResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.LoginResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -97,13 +97,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -131,19 +131,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.LoginResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.LoginResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -169,7 +169,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.RegisterRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.RegisterRequest"
                         }
                     }
                 ],
@@ -177,25 +177,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/service.UserProfile"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile"
                         }
                     },
                     "409": {
                         "description": "Username or email already exists",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -248,14 +248,14 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/service.CommentInfo"
+                                "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -287,25 +287,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.CommentInfo"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo"
                         }
                     },
                     "400": {
                         "description": "Invalid comment ID",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Comment not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -343,25 +343,25 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - not the author",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Comment not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -397,7 +397,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UpdateCommentRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.UpdateCommentRequest"
                         }
                     }
                 ],
@@ -408,31 +408,31 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - not the author",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Comment not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -485,14 +485,14 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/service.PostInfo"
+                                "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -524,25 +524,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.PostInfo"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo"
                         }
                     },
                     "400": {
                         "description": "Invalid post ID",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Post not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -580,25 +580,25 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - not the author",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Post not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -634,7 +634,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UpdatePostRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.UpdatePostRequest"
                         }
                     }
                 ],
@@ -645,31 +645,31 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - not the author",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Post not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -707,7 +707,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.CreateCommentRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.CreateCommentRequest"
                         }
                     }
                 ],
@@ -715,25 +715,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/service.CommentInfo"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Post not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -780,14 +780,14 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/service.TopicInfo"
+                                "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -816,7 +816,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.CreateTopicRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.CreateTopicRequest"
                         }
                     }
                 ],
@@ -824,25 +824,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/service.TopicInfo"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Topic title already exists",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -874,25 +874,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.TopicInfo"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo"
                         }
                     },
                     "400": {
                         "description": "Invalid topic ID",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Topic not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -930,25 +930,25 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - not the author",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Topic not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -984,7 +984,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UpdateTopicRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.UpdateTopicRequest"
                         }
                     }
                 ],
@@ -995,31 +995,31 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - not the author",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Topic not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -1057,7 +1057,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.CreatePostRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.CreatePostRequest"
                         }
                     }
                 ],
@@ -1065,25 +1065,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/service.PostInfo"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Topic not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -1111,19 +1111,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.UserProfile"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -1152,7 +1152,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UpdateUserRequest"
+                            "$ref": "#/definitions/internal_handlers_v1.UpdateUserRequest"
                         }
                     }
                 ],
@@ -1163,19 +1163,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "422": {
                         "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -1207,25 +1207,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.UserProfile"
+                            "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile"
                         }
                     },
                     "400": {
                         "description": "Invalid user ID",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/v1.ErrorResponse"
+                            "$ref": "#/definitions/internal_handlers_v1.ErrorResponse"
                         }
                     }
                 }
@@ -1233,11 +1233,11 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "service.CommentInfo": {
+        "github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo": {
             "type": "object",
             "properties": {
                 "author": {
-                    "$ref": "#/definitions/service.UserProfile"
+                    "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile"
                 },
                 "comment_id": {
                     "type": "integer"
@@ -1256,16 +1256,16 @@ const docTemplate = `{
                 }
             }
         },
-        "service.PostInfo": {
+        "github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo": {
             "type": "object",
             "properties": {
                 "author": {
-                    "$ref": "#/definitions/service.UserProfile"
+                    "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile"
                 },
                 "comments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/service.CommentInfo"
+                        "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo"
                     }
                 },
                 "content": {
@@ -1288,11 +1288,11 @@ const docTemplate = `{
                 }
             }
         },
-        "service.TopicInfo": {
+        "github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo": {
             "type": "object",
             "properties": {
                 "author": {
-                    "$ref": "#/definitions/service.UserProfile"
+                    "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile"
                 },
                 "created_at": {
                     "type": "string"
@@ -1306,7 +1306,7 @@ const docTemplate = `{
                 "posts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/service.PostInfo"
+                        "$ref": "#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo"
                     }
                 },
                 "topic_id": {
@@ -1317,7 +1317,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.UserProfile": {
+        "github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile": {
             "type": "object",
             "properties": {
                 "avatar_url": {
@@ -1343,7 +1343,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.CreateCommentRequest": {
+        "internal_handlers_v1.CreateCommentRequest": {
             "type": "object",
             "required": [
                 "content"
@@ -1355,7 +1355,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.CreatePostRequest": {
+        "internal_handlers_v1.CreatePostRequest": {
             "type": "object",
             "required": [
                 "title"
@@ -1371,7 +1371,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.CreateTopicRequest": {
+        "internal_handlers_v1.CreateTopicRequest": {
             "type": "object",
             "required": [
                 "title"
@@ -1387,16 +1387,20 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.ErrorResponse": {
+        "internal_handlers_v1.ErrorResponse": {
             "type": "object",
             "properties": {
-                "error": {
+                "error_code": {
                     "type": "string",
-                    "example": "error message"
+                    "example": "INVALID_INPUT"
+                },
+                "error_message": {
+                    "type": "string",
+                    "example": "The provided input is invalid"
                 }
             }
         },
-        "v1.LoginRequest": {
+        "internal_handlers_v1.LoginRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -1413,7 +1417,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.LoginResponse": {
+        "internal_handlers_v1.LoginResponse": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -1432,7 +1436,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.RegisterRequest": {
+        "internal_handlers_v1.RegisterRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -1454,7 +1458,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UpdateCommentRequest": {
+        "internal_handlers_v1.UpdateCommentRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -1463,7 +1467,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UpdatePostRequest": {
+        "internal_handlers_v1.UpdatePostRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -1476,7 +1480,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UpdateTopicRequest": {
+        "internal_handlers_v1.UpdateTopicRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -1489,7 +1493,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UpdateUserRequest": {
+        "internal_handlers_v1.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "avatar_url": {
@@ -1520,7 +1524,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "CVWO Forum API",
-	Description:      "API for CVWO forum assignment backend",
+	Description:      "API for CVWO forum assignment backend\n\n## Error Responses\nAll error responses follow a consistent structure with two fields:\n- `error_code`: Machine-readable error code (e.g., INVALID_INPUT, USER_NOT_FOUND)\n- `error_message`: Human-readable error message\n\nExample: `{\"error_code\": \"INVALID_INPUT\", \"error_message\": \"invalid input\"}`",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
