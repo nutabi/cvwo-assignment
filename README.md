@@ -134,7 +134,43 @@ LLMs is a must if I want to get proficient quickly. Currently, I'm using both
 Claude and Gemini to help me learn and understand errors. AI disclosures will
 be updated from time to time to reflect this usage.
 
-## 1.3. Relational Data Models
+## 1.3. API Error Handling
+
+All API error responses follow a consistent structure with two fields:
+
+- `error_code`: A machine-readable error code (e.g., `INVALID_INPUT`, `USER_NOT_FOUND`)
+- `error_message`: A human-readable error message
+
+Example error response:
+```json
+{
+  "error_code": "INVALID_INPUT",
+  "error_message": "invalid input"
+}
+```
+
+### 1.3.1. Error Codes
+
+| Error Code | HTTP Status | Description |
+|------------|-------------|-------------|
+| `UNAUTHORIZED` | 401 | User is not authenticated |
+| `FORBIDDEN` | 403 | User lacks permission for the operation |
+| `BAD_REQUEST` | 400 | Invalid request parameters |
+| `INVALID_INPUT` | 400 | Invalid request body or input validation failed |
+| `NOT_FOUND` | 404 | Generic resource not found |
+| `USER_NOT_FOUND` | 404 | User does not exist |
+| `TOPIC_NOT_FOUND` | 404 | Topic does not exist |
+| `POST_NOT_FOUND` | 404 | Post does not exist |
+| `COMMENT_NOT_FOUND` | 404 | Comment does not exist |
+| `CONFLICT` | 409 | Generic conflict error |
+| `USERNAME_TAKEN` | 409 | Username already exists |
+| `EMAIL_IN_USE` | 409 | Email already registered |
+| `TOPIC_TITLE_TAKEN` | 409 | Topic title already exists |
+| `UNPROCESSABLE_ENTITY` | 422 | Request is well-formed but semantically incorrect |
+| `NO_UPDATE_FIELDS` | 422 | No valid fields provided for update |
+| `INTERNAL_SERVER_ERROR` | 500 | Internal server error |
+
+## 1.4. Relational Data Models
 
 The followings were considered during design:
 
@@ -147,7 +183,7 @@ changes will be made to ownership of topics, posts, and comments on deletion.
 - Soft-deletion (with `is_deleted`) is used to allow archival and undoing,
 except for users. This also allows re-usability of usernames.
 
-### 1.3.1. `users`
+### 1.4.1. `users`
 
 | name       | type      | constraints      |
 |------------|-----------|------------------|
@@ -161,7 +197,7 @@ except for users. This also allows re-usability of usernames.
 | updated_at | timestamp | not null         |
 | deleted_at | timestamp | nullable (soft delete) |
 
-### 1.3.2. `topics`
+### 1.4.2. `topics`
 
 | name        | type      | constraints                                       |
 |-------------|-----------|---------------------------------------------------|
@@ -173,7 +209,7 @@ except for users. This also allows re-usability of usernames.
 | updated_at  | timestamp | not null                                          |
 | deleted_at  | timestamp | nullable (soft delete)                            |
 
-### 1.3.3. `posts`
+### 1.4.3. `posts`
 
 | name       | type      | constraints                                          |
 |------------|-----------|------------------------------------------------------|
@@ -186,7 +222,7 @@ except for users. This also allows re-usability of usernames.
 | updated_at | timestamp | not null                                             |
 | deleted_at | timestamp | nullable (soft delete)                               |
 
-### 1.3.4. `comments`
+### 1.4.4. `comments`
 
 | name       | type      | constraints                                        |
 |------------|-----------|----------------------------------------------------||
@@ -198,7 +234,7 @@ except for users. This also allows re-usability of usernames.
 | updated_at | timestamp | not null                                           |
 | deleted_at | timestamp | nullable (soft delete)                             |
 
-## 1.4. Project Structures
+## 1.5. Project Structures
 
 The frontend and backend code will be organised into a single monorepo.
 Since this is my first time using these languages/frameworks, I'll stick to the
