@@ -18,7 +18,6 @@ type config struct {
 	debug          bool
 	corsOrigins    []string
 	logLevel       slog.Level
-	logRoot        string
 }
 
 // Return the application configuration.
@@ -86,10 +85,6 @@ func LoadConfig() (Config, error) {
 		}
 	}
 
-	// Parse log root (optional, defaults to stdout)
-	// Ignored in debug mode
-	logRoot := os.Getenv("LOG_ROOT")
-
 	cfg := config{
 		serverHostname: getRequired("SERVER_HOSTNAME"),
 		serverPort:     getRequiredInt("SERVER_PORT"),
@@ -98,7 +93,6 @@ func LoadConfig() (Config, error) {
 		debug:          isDebug,
 		corsOrigins:    corsOrigins,
 		logLevel:       logLevel,
-		logRoot:        logRoot,
 	}
 
 	if isBad {
@@ -138,8 +132,4 @@ func (c *config) GetCORSOrigins() []string {
 
 func (c *config) GetLogLevel() slog.Level {
 	return c.logLevel
-}
-
-func (c *config) GetLogRoot() string {
-	return c.logRoot
 }

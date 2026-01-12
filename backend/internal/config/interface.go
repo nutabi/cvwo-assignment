@@ -27,8 +27,4 @@ type Config interface {
 
 	// Get log level for structured logging.
 	GetLogLevel() slog.Level
-
-	// Get log root path. Empty string means stdout.
-	// Ignored in debug mode (always logs to console).
-	GetLogRoot() string
 }
