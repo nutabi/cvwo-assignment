@@ -1,9 +1,9 @@
 basePath: /api/v1
 definitions:
-  service.CommentInfo:
+  github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo:
     properties:
       author:
-        $ref: '#/definitions/service.UserProfile'
+        $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile'
       comment_id:
         type: integer
       content:
@@ -15,13 +15,13 @@ definitions:
       updated_at:
         type: string
     type: object
-  service.PostInfo:
+  github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo:
     properties:
       author:
-        $ref: '#/definitions/service.UserProfile'
+        $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile'
       comments:
         items:
-          $ref: '#/definitions/service.CommentInfo'
+          $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo'
         type: array
       content:
         type: string
@@ -36,10 +36,10 @@ definitions:
       updated_at:
         type: string
     type: object
-  service.TopicInfo:
+  github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo:
     properties:
       author:
-        $ref: '#/definitions/service.UserProfile'
+        $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile'
       created_at:
         type: string
       description:
@@ -48,14 +48,14 @@ definitions:
         type: string
       posts:
         items:
-          $ref: '#/definitions/service.PostInfo'
+          $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo'
         type: array
       topic_id:
         type: integer
       updated_at:
         type: string
     type: object
-  service.UserProfile:
+  github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile:
     properties:
       avatar_url:
         type: string
@@ -72,7 +72,7 @@ definitions:
       username:
         type: string
     type: object
-  v1.CreateCommentRequest:
+  internal_handlers_v1.CreateCommentRequest:
     properties:
       content:
         example: This is a comment
@@ -80,7 +80,7 @@ definitions:
     required:
     - content
     type: object
-  v1.CreatePostRequest:
+  internal_handlers_v1.CreatePostRequest:
     properties:
       content:
         example: This is the content of my post
@@ -91,7 +91,7 @@ definitions:
     required:
     - title
     type: object
-  v1.CreateTopicRequest:
+  internal_handlers_v1.CreateTopicRequest:
     properties:
       description:
         example: A place for general conversations
@@ -102,13 +102,16 @@ definitions:
     required:
     - title
     type: object
-  v1.ErrorResponse:
+  internal_handlers_v1.ErrorResponse:
     properties:
-      error:
-        example: error message
+      error_code:
+        example: INVALID_INPUT
+        type: string
+      error_message:
+        example: The provided input is invalid
         type: string
     type: object
-  v1.LoginRequest:
+  internal_handlers_v1.LoginRequest:
     properties:
       password:
         example: securepassword123
@@ -120,7 +123,7 @@ definitions:
     - password
     - username
     type: object
-  v1.LoginResponse:
+  internal_handlers_v1.LoginResponse:
     properties:
       access_token:
         type: string
@@ -133,7 +136,7 @@ definitions:
         example: Bearer
         type: string
     type: object
-  v1.RegisterRequest:
+  internal_handlers_v1.RegisterRequest:
     properties:
       email:
         example: john@example.com
@@ -149,13 +152,13 @@ definitions:
     - password
     - username
     type: object
-  v1.UpdateCommentRequest:
+  internal_handlers_v1.UpdateCommentRequest:
     properties:
       content:
         example: Updated comment content
         type: string
     type: object
-  v1.UpdatePostRequest:
+  internal_handlers_v1.UpdatePostRequest:
     properties:
       content:
         example: Updated post content
@@ -164,7 +167,7 @@ definitions:
         example: Updated Post Title
         type: string
     type: object
-  v1.UpdateTopicRequest:
+  internal_handlers_v1.UpdateTopicRequest:
     properties:
       description:
         example: Updated description
@@ -173,7 +176,7 @@ definitions:
         example: Updated Topic Title
         type: string
     type: object
-  v1.UpdateUserRequest:
+  internal_handlers_v1.UpdateUserRequest:
     properties:
       avatar_url:
         example: https://example.com/avatar.jpg
@@ -185,7 +188,15 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: API for CVWO forum assignment backend
+  description: |-
+    API for CVWO forum assignment backend
+
+    ## Error Responses
+    All error responses follow a consistent structure with two fields:
+    - `error_code`: Machine-readable error code (e.g., INVALID_INPUT, USER_NOT_FOUND)
+    - `error_message`: Human-readable error message
+
+    Example: `{"error_code": "INVALID_INPUT", "error_message": "invalid input"}`
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -204,22 +215,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.LoginRequest'
+          $ref: '#/definitions/internal_handlers_v1.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.LoginResponse'
+            $ref: '#/definitions/internal_handlers_v1.LoginResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: User login
       tags:
       - auth
@@ -240,11 +251,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: User logout
@@ -261,15 +272,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.LoginResponse'
+            $ref: '#/definitions/internal_handlers_v1.LoginResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Refresh JWT token
@@ -286,26 +297,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.RegisterRequest'
+          $ref: '#/definitions/internal_handlers_v1.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/service.UserProfile'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile'
         "409":
           description: Username or email already exists
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "422":
           description: Invalid input
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: Register a new user
       tags:
       - auth
@@ -341,12 +352,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/service.CommentInfo'
+              $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: List comments
       tags:
       - comments
@@ -369,19 +380,19 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "403":
           description: Forbidden - not the author
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Comment not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a comment
@@ -403,19 +414,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.CommentInfo'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo'
         "400":
           description: Invalid comment ID
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Comment not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: Get comment by ID
       tags:
       - comments
@@ -434,7 +445,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.UpdateCommentRequest'
+          $ref: '#/definitions/internal_handlers_v1.UpdateCommentRequest'
       produces:
       - application/json
       responses:
@@ -443,23 +454,23 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "403":
           description: Forbidden - not the author
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Comment not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "422":
           description: Invalid input
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update a comment
@@ -497,12 +508,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/service.PostInfo'
+              $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: List posts
       tags:
       - posts
@@ -525,19 +536,19 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "403":
           description: Forbidden - not the author
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Post not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a post
@@ -559,19 +570,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.PostInfo'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo'
         "400":
           description: Invalid post ID
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Post not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: Get post by ID
       tags:
       - posts
@@ -590,7 +601,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.UpdatePostRequest'
+          $ref: '#/definitions/internal_handlers_v1.UpdatePostRequest'
       produces:
       - application/json
       responses:
@@ -599,23 +610,23 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "403":
           description: Forbidden - not the author
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Post not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "422":
           description: Invalid input
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update a post
@@ -637,26 +648,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.CreateCommentRequest'
+          $ref: '#/definitions/internal_handlers_v1.CreateCommentRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/service.CommentInfo'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.CommentInfo'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Post not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a new comment
@@ -689,12 +700,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/service.TopicInfo'
+              $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: List topics
       tags:
       - topics
@@ -708,26 +719,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.CreateTopicRequest'
+          $ref: '#/definitions/internal_handlers_v1.CreateTopicRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/service.TopicInfo'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "409":
           description: Topic title already exists
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a new topic
@@ -752,19 +763,19 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "403":
           description: Forbidden - not the author
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Topic not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a topic
@@ -786,19 +797,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.TopicInfo'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.TopicInfo'
         "400":
           description: Invalid topic ID
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Topic not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: Get topic by ID
       tags:
       - topics
@@ -817,7 +828,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.UpdateTopicRequest'
+          $ref: '#/definitions/internal_handlers_v1.UpdateTopicRequest'
       produces:
       - application/json
       responses:
@@ -826,23 +837,23 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "403":
           description: Forbidden - not the author
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Topic not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "422":
           description: Invalid input
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update a topic
@@ -864,26 +875,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.CreatePostRequest'
+          $ref: '#/definitions/internal_handlers_v1.CreatePostRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/service.PostInfo'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.PostInfo'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: Topic not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a new post
@@ -906,19 +917,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.UserProfile'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile'
         "400":
           description: Invalid user ID
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       summary: Get user profile by ID
       tags:
       - users
@@ -933,15 +944,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.UserProfile'
+            $ref: '#/definitions/github_com_nutabi_cvwo-assignment_backend_internal_service.UserProfile'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Get current user profile
@@ -957,7 +968,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.UpdateUserRequest'
+          $ref: '#/definitions/internal_handlers_v1.UpdateUserRequest'
       produces:
       - application/json
       responses:
@@ -966,15 +977,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "422":
           description: Invalid input
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/v1.ErrorResponse'
+            $ref: '#/definitions/internal_handlers_v1.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update current user profile

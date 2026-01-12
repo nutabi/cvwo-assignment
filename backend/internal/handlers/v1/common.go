@@ -16,7 +16,54 @@ import (
 
 // ErrorResponse represents an error response
 type ErrorResponse struct {
-	Error string `json:"error" example:"error message"`
+	ErrorCode    string `json:"error_code" example:"INVALID_INPUT"`
+	ErrorMessage string `json:"error_message" example:"The provided input is invalid"`
+}
+
+// Error codes
+const (
+	ErrCodeUnauthorized        = "UNAUTHORIZED"
+	ErrCodeForbidden           = "FORBIDDEN"
+	ErrCodeInternalServer      = "INTERNAL_SERVER_ERROR"
+	ErrCodeBadRequest          = "BAD_REQUEST"
+	ErrCodeNotFound            = "NOT_FOUND"
+	ErrCodeConflict            = "CONFLICT"
+	ErrCodeUnprocessableEntity = "UNPROCESSABLE_ENTITY"
+	ErrCodeInvalidInput        = "INVALID_INPUT"
+	ErrCodeCommentNotFound     = "COMMENT_NOT_FOUND"
+	ErrCodeUserNotFound        = "USER_NOT_FOUND"
+	ErrCodeUsernameTaken       = "USERNAME_TAKEN"
+	ErrCodeEmailInUse          = "EMAIL_IN_USE"
+	ErrCodeTopicNotFound       = "TOPIC_NOT_FOUND"
+	ErrCodeTopicTitleTaken     = "TOPIC_TITLE_TAKEN"
+	ErrCodePostNotFound        = "POST_NOT_FOUND"
+	ErrCodeNoUpdateFields      = "NO_UPDATE_FIELDS"
+)
+
+// errorInfo holds HTTP status code and message for an error code
+type errorInfo struct {
+	httpStatus int
+	message    string
+}
+
+// errorCodeMap maps error codes to their HTTP status and messages
+var errorCodeMap = map[string]errorInfo{
+	ErrCodeUnauthorized:        {http.StatusUnauthorized, "unauthorised"},
+	ErrCodeForbidden:           {http.StatusForbidden, "forbidden"},
+	ErrCodeInternalServer:      {http.StatusInternalServerError, "internal server error"},
+	ErrCodeBadRequest:          {http.StatusBadRequest, "bad request"},
+	ErrCodeNotFound:            {http.StatusNotFound, "not found"},
+	ErrCodeConflict:            {http.StatusConflict, "conflict"},
+	ErrCodeUnprocessableEntity: {http.StatusUnprocessableEntity, "unprocessable entity"},
+	ErrCodeInvalidInput:        {http.StatusBadRequest, "invalid input"},
+	ErrCodeCommentNotFound:     {http.StatusNotFound, "comment not found"},
+	ErrCodeUserNotFound:        {http.StatusNotFound, "user not found"},
+	ErrCodeUsernameTaken:       {http.StatusConflict, "username taken"},
+	ErrCodeEmailInUse:          {http.StatusConflict, "email in use"},
+	ErrCodeTopicNotFound:       {http.StatusNotFound, "topic not found"},
+	ErrCodeTopicTitleTaken:     {http.StatusConflict, "topic title already exists"},
+	ErrCodePostNotFound:        {http.StatusNotFound, "post not found"},
+	ErrCodeNoUpdateFields:      {http.StatusUnprocessableEntity, "no fields to update"},
 }
 
 // LoginResponse represents user login response with JWT token
@@ -80,42 +127,53 @@ type UpdateCommentRequest struct {
 	Content *string `json:"content" example:"Updated comment content"`
 }
 
-// Helper function to respond with an error message and HTTP status code.
-func handleError(c *gin.Context, code int, message string) {
-	c.JSON(code, gin.H{"error": message})
+// Helper function to respond with an error based on error code.
+// The HTTP status code and message are determined automatically from the error code.
+func handleError(c *gin.Context, errorCode string) {
+	info, ok := errorCodeMap[errorCode]
+	if !ok {
+		// Fallback to internal server error if error code is unknown
+		info = errorCodeMap[ErrCodeInternalServer]
+		errorCode = ErrCodeInternalServer
+	}
+	
+	c.JSON(info.httpStatus, ErrorResponse{
+		ErrorCode:    errorCode,
+		ErrorMessage: info.message,
+	})
 }
 
 // Responds with a generic 401 Unauthorized error.
 func handleUnauthorised(c *gin.Context) {
-	handleError(c, http.StatusUnauthorized, "unauthorised")
+	handleError(c, ErrCodeUnauthorized)
 }
 
 // Responds with a generic 500 Internal Server Error.
 func handleInternalError(c *gin.Context) {
-	handleError(c, http.StatusInternalServerError, "internal server error")
+	handleError(c, ErrCodeInternalServer)
 }
 
 // Responds with appropriate HTTP status codes based on the provided service error.
 func handleServiceError(c *gin.Context, err error) {
 	if err != nil {
 		if errors.Is(err, service.ErrCommentNotFound) {
-			handleError(c, http.StatusNotFound, err.Error())
+			handleError(c, ErrCodeCommentNotFound)
 		} else if errors.Is(err, service.ErrUserNotFound) {
-			handleError(c, http.StatusNotFound, err.Error())
+			handleError(c, ErrCodeUserNotFound)
 		} else if errors.Is(err, service.ErrUsernameTaken) {
-			handleError(c, http.StatusConflict, err.Error())
+			handleError(c, ErrCodeUsernameTaken)
 		} else if errors.Is(err, service.ErrEmailInUse) {
-			handleError(c, http.StatusConflict, err.Error())
+			handleError(c, ErrCodeEmailInUse)
 		} else if errors.Is(err, service.ErrTopicNotFound) {
-			handleError(c, http.StatusNotFound, err.Error())
+			handleError(c, ErrCodeTopicNotFound)
 		} else if errors.Is(err, service.ErrTopicTitleTaken) {
-			handleError(c, http.StatusConflict, err.Error())
+			handleError(c, ErrCodeTopicTitleTaken)
 		} else if errors.Is(err, service.ErrPostNotFound) {
-			handleError(c, http.StatusNotFound, err.Error())
+			handleError(c, ErrCodePostNotFound)
 		} else if errors.Is(err, service.ErrForbidden) {
-			handleError(c, http.StatusForbidden, err.Error())
+			handleError(c, ErrCodeForbidden)
 		} else if errors.Is(err, service.ErrNoUpdateFields) {
-			handleError(c, http.StatusUnprocessableEntity, err.Error())
+			handleError(c, ErrCodeNoUpdateFields)
 		} else {
 			// Generic internal server error for unhandled cases
 			// as well as the following errors:
@@ -126,7 +184,7 @@ func handleServiceError(c *gin.Context, err error) {
 				"path", c.Request.URL.Path,
 				"error", err,
 			)
-			handleError(c, http.StatusInternalServerError, "Internal server error")
+			handleError(c, ErrCodeInternalServer)
 		}
 		return
 	}
@@ -173,7 +231,7 @@ func tryGetPagingParams(c *gin.Context) (limit, offset int) {
 func mustGetStrParam(c *gin.Context, paramName string) string {
 	paramValue := c.Param(paramName)
 	if paramValue == "" {
-		handleError(c, http.StatusBadRequest, "missing required parameter: "+paramName)
+		handleError(c, ErrCodeBadRequest)
 	}
 	return paramValue
 }
@@ -184,7 +242,7 @@ func mustGetIntParam(c *gin.Context, paramName string) (int, bool) {
 	paramValueStr := mustGetStrParam(c, paramName)
 	paramValue, err := strconv.Atoi(paramValueStr)
 	if err != nil {
-		handleError(c, http.StatusBadRequest, "invalid integer parameter: "+paramName)
+		handleError(c, ErrCodeBadRequest)
 		return 0, false
 	}
 	return paramValue, true
@@ -193,7 +251,7 @@ func mustGetIntParam(c *gin.Context, paramName string) (int, bool) {
 func mustGetIDParam(c *gin.Context, paramName string) (uint, bool) {
 	id, ok := mustGetIntParam(c, paramName)
 	if ok && id <= 0 {
-		handleError(c, http.StatusBadRequest, "invalid ID parameter: "+paramName)
+		handleError(c, ErrCodeBadRequest)
 		return 0, false
 	}
 	return uint(id), true
@@ -221,7 +279,7 @@ func mustRetrieveUser(c *gin.Context) *model.User {
 // Returns true if binding was successful, false otherwise.
 func mustBindReqBody(c *gin.Context, obj any) bool {
 	if err := c.ShouldBind(obj); err != nil {
-		handleError(c, http.StatusBadRequest, "invalid request body")
+		handleError(c, ErrCodeInvalidInput)
 		return false
 	}
 	return true

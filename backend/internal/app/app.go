@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"io"
 	"log/slog"
 	"net/http"
 	"os"
@@ -18,6 +17,7 @@ import (
 	"github.com/nutabi/cvwo-assignment/backend/internal/repository/sql"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service"
 	"github.com/nutabi/cvwo-assignment/backend/internal/service/primary"
+	"github.com/nutabi/cvwo-assignment/backend/internal/utility"
 	"gorm.io/driver/sqlite"
 )
 
@@ -27,38 +27,16 @@ type App struct {
 	authMiddleware *gin_jwt.GinJWTMiddleware
 	isDebug        bool
 	corsOrigins    []string
-	logFile        *os.File // Track log file for cleanup
 }
 
 func Initialise(cfg config.Config) App {
-	// Set up structured logging
-	var logWriter io.Writer = os.Stdout
-	var logFile *os.File
-
-	// In debug mode, always log to console; otherwise use configured destination
-	if !cfg.IsDebug() && cfg.GetLogRoot() != "" {
-		file, err := os.OpenFile(cfg.GetLogRoot(), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		if err != nil {
-			slog.Warn("Failed to open log file, falling back to stdout", "path", cfg.GetLogRoot(), "error", err)
-		} else {
-			logWriter = file
-			logFile = file
-		}
-	}
-
-	// Create handler with configured log level
+	// Set up structured logging - always to console with human-readable format
 	handlerOpts := &slog.HandlerOptions{
 		Level: cfg.GetLogLevel(),
 	}
-
-	var handler slog.Handler
-	if cfg.IsDebug() {
-		// Use text handler for readable console output in debug mode
-		handler = slog.NewTextHandler(logWriter, handlerOpts)
-	} else {
-		// Use JSON handler for structured logging in production
-		handler = slog.NewJSONHandler(logWriter, handlerOpts)
-	}
+	
+	// Use custom pretty handler for readable, colorized console output
+	handler := utility.NewPrettyHandler(os.Stdout, handlerOpts)
 
 	// Set as default logger
 	slog.SetDefault(slog.New(handler))
@@ -105,7 +83,6 @@ func Initialise(cfg config.Config) App {
 		authMiddleware: auth,
 		isDebug:        cfg.IsDebug(),
 		corsOrigins:    cfg.GetCORSOrigins(),
-		logFile:        logFile,
 	}
 }
 
@@ -156,13 +133,6 @@ func (a *App) Start() {
 
 	if err := srv.Shutdown(ctx); err != nil {
 		slog.Error("server forced to shutdown", "error", err)
-	}
-
-	// Close log file if opened
-	if a.logFile != nil {
-		if err := a.logFile.Close(); err != nil {
-			slog.Error("failed to close log file", "error", err)
-		}
 	}
 
 	slog.Info("server stopped")

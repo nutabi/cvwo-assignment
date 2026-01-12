@@ -19,8 +19,10 @@ func NewCORSConfig(isDebug bool, allowedOrigins []string) gin.HandlerFunc {
 	}
 
 	if isDebug {
-		// Development: Allow all origins for easier testing
-		config.AllowAllOrigins = true
+		// Development: Allow common dev origins with credentials
+		config.AllowOriginFunc = func(origin string) bool {
+			return true // Allow all origins in debug mode
+		}
 		slog.Info("CORS configured for development mode (allowing all origins)")
 	} else {
 		// Production: Use configured origins or fallback to restrictive default

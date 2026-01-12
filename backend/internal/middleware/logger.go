@@ -39,7 +39,12 @@ func NewRequestLogger() gin.HandlerFunc {
 			attrs = append(attrs, slog.String("errors", c.Errors.String()))
 		}
 
-		// Log at debug level for endpoint usage
-		slog.Debug("request processed", attrs...)
+		// Log at ERROR level for 5xx responses, otherwise at DEBUG level
+		status := c.Writer.Status()
+		if status >= 500 {
+			slog.Error("request processed", attrs...)
+		} else {
+			slog.Debug("request processed", attrs...)
+		}
 	}
 }

@@ -96,7 +96,7 @@ func handleUpdateUserProfile(svc service.Service) gin.HandlerFunc {
 
 		// At least one field must be provided
 		if updateReq.AvatarUrl == nil && updateReq.Bio == nil {
-			handleError(c, http.StatusUnprocessableEntity, "at least one field must be provided")
+			handleError(c, ErrCodeInvalidInput)
 			return
 		}
 

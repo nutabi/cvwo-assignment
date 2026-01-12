@@ -157,7 +157,7 @@ func handleUpdateTopic(svc service.Service) gin.HandlerFunc {
 
 		// Make sure at least one field is being updated
 		if req.Title == nil && req.Description == nil {
-			handleError(c, http.StatusUnprocessableEntity, "at least one field must be provided")
+			handleError(c, ErrCodeInvalidInput)
 			return
 		}
 
