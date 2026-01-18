@@ -144,8 +144,8 @@ func handleError(c *gin.Context, errorCode string) {
 		info = errorCodeMap[ErrCodeInternalServer]
 		errorCode = ErrCodeInternalServer
 	}
-	
-	c.JSON(info.httpStatus, ErrorResponse{
+
+	c.AbortWithStatusJSON(info.httpStatus, ErrorResponse{
 		ErrorCode:    errorCode,
 		ErrorMessage: info.message,
 	})

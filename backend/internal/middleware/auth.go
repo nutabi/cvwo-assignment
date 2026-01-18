@@ -122,7 +122,7 @@ func NewAuthConfig(
 				errorMessage = "missing authentication cookie"
 			}
 
-			c.JSON(code, gin.H{
+			c.AbortWithStatusJSON(code, gin.H{
 				"error_code":    errorCode,
 				"error_message": errorMessage,
 			})
