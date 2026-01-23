@@ -49,31 +49,25 @@
 
 ## 1.3. Manual Backend Setup (Development)
 
-1. Navigate to the backend directory:
-
-   ```bash
-   cd backend
-   ```
-
-2. Install dependencies:
+1. Install dependencies:
 
    ```bash
    go mod download
    ```
 
-3. Create a `.env` file in the project root (copy from `example.env`):
+2. Create a `.env` file in the project root (copy from `example.env`):
 
    ```bash
-   cp ../example.env ../.env
+   cp example.env .env
    ```
 
-4. Update the `.env` file with appropriate values, especially:
+3. Update the `.env` file with appropriate values, especially:
 
    - `JWT_SECRET`: Set to a secure random string
    - `DEBUG`: Set to `true` for development
    - `DATABASE_URL`: Path to SQLite database file
 
-5. Run the backend:
+4. Run the backend:
 
    ```bash
    go run cmd/api/main.go
