@@ -93,9 +93,9 @@ func (r *sqlRepository) UpdatePost(
 }
 
 func (r *sqlRepository) DeletePost(ctx context.Context, postID uint) error {
-	slog.Debug("deleting post", "post_id", postID)
+	slog.Debug("deleting post (hard delete)", "post_id", postID)
 	_, err := gorm.
-		G[model.Post](r.db).
+		G[model.Post](r.db.Unscoped()).
 		Where("id = ?", postID).
 		Delete(ctx)
 	return err

@@ -30,6 +30,10 @@ const (
 	ErrCodeConflict            = "CONFLICT"
 	ErrCodeUnprocessableEntity = "UNPROCESSABLE_ENTITY"
 	ErrCodeInvalidInput        = "INVALID_INPUT"
+	ErrCodeInvalidCredentials  = "INVALID_CREDENTIALS"
+	ErrCodeMissingLoginValues  = "MISSING_LOGIN_VALUES"
+	ErrCodeTokenExpired        = "TOKEN_EXPIRED"
+	ErrCodeTokenInvalid        = "TOKEN_INVALID"
 	ErrCodeCommentNotFound     = "COMMENT_NOT_FOUND"
 	ErrCodeUserNotFound        = "USER_NOT_FOUND"
 	ErrCodeUsernameTaken       = "USERNAME_TAKEN"
@@ -56,6 +60,10 @@ var errorCodeMap = map[string]errorInfo{
 	ErrCodeConflict:            {http.StatusConflict, "conflict"},
 	ErrCodeUnprocessableEntity: {http.StatusUnprocessableEntity, "unprocessable entity"},
 	ErrCodeInvalidInput:        {http.StatusBadRequest, "invalid input"},
+	ErrCodeInvalidCredentials:  {http.StatusUnauthorized, "invalid username or password"},
+	ErrCodeMissingLoginValues:  {http.StatusBadRequest, "missing username or password"},
+	ErrCodeTokenExpired:        {http.StatusUnauthorized, "token has expired"},
+	ErrCodeTokenInvalid:        {http.StatusUnauthorized, "invalid token"},
 	ErrCodeCommentNotFound:     {http.StatusNotFound, "comment not found"},
 	ErrCodeUserNotFound:        {http.StatusNotFound, "user not found"},
 	ErrCodeUsernameTaken:       {http.StatusConflict, "username taken"},
@@ -136,8 +144,8 @@ func handleError(c *gin.Context, errorCode string) {
 		info = errorCodeMap[ErrCodeInternalServer]
 		errorCode = ErrCodeInternalServer
 	}
-	
-	c.JSON(info.httpStatus, ErrorResponse{
+
+	c.AbortWithStatusJSON(info.httpStatus, ErrorResponse{
 		ErrorCode:    errorCode,
 		ErrorMessage: info.message,
 	})

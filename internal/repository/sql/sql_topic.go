@@ -111,9 +111,9 @@ func (r *sqlRepository) DeleteTopic(
 	ctx context.Context,
 	topicID uint,
 ) error {
-	slog.Debug("deleting topic", "topic_id", topicID)
+	slog.Debug("deleting topic (hard delete)", "topic_id", topicID)
 	_, err := gorm.
-		G[model.Topic](r.db).
+		G[model.Topic](r.db.Unscoped()).
 		Where("id = ?", topicID).
 		Delete(ctx)
 	return err
