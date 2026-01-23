@@ -72,9 +72,9 @@ func (r *sqlRepository) UpdateComment(ctx context.Context, commentID uint, conte
 }
 
 func (r *sqlRepository) DeleteComment(ctx context.Context, commentID uint) error {
-	slog.Debug("deleting comment", "comment_id", commentID)
+	slog.Debug("deleting comment (hard delete)", "comment_id", commentID)
 	_, err := gorm.
-		G[model.Comment](r.db).
+		G[model.Comment](r.db.Unscoped()).
 		Where("id = ?", commentID).
 		Delete(ctx)
 	return err
